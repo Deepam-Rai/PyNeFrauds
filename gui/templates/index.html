@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Graph Dashboard</title>
+
+    <!-- Cytoscape.js library -->
+    <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
+
+    <!-- Custom styles -->
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .card-container {
+            /* display: flex; */
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 10px 15px 10px 15px;
+        }
+
+        .card {
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 24px 24px 10px 10px;
+        }
+
+        .constraint-card {
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 24px 24px 10px 10px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin: 0 0 16px 0;
+        }
+
+        form {
+            /* display: flex; */
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        label {
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        input,
+        select {
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
+            background-color: #fff;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type="submit"] {
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .constraint-input {
+            display: flex;
+        }
+
+        .constraint-prefix-container {
+            padding: 15px 15px 15px 15px;
+        }
+
+        .constraint-field {
+            display: none;
+            padding: 15px 15px 15px 15px;
+        }
+
+        #cy {
+            height: 500px;
+            border: 1px solid #ccc;
+            margin-top: 24px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Graph Dashboard</h1>
+    <div class="card-container">
+        <div class="card">
+            <form id="query-form">
+                <label for="nodes">Node:</label>
+                <select name="nodes" id="nodes">
+                    <option value="null">-- Select a node type --</option>
+                </select>
+                <input type="submit" value="Create">
+                <!-- </form> -->
+                <br>
+                <div class="constraint-card">
+                    <!-- <form> -->
+                    <label for="properties">Property:</label>
+                    <select name="properties" id="properties">
+                        <option value="null">-- Select a property --</option>
+                    </select>
+                    <div id="constraint-input" class="constraint-input">
+                        <div class='constraint-prefix-container'>
+                            <select name="constraint-prefix" id="constraint-prefix" style="display: none;">
+                            </select>
+                        </div>
+
+                        <div id="regex-constraint" class="constraint-field">
+                            <label for="regex">Regex:</label>
+                            <input type="text" name="regex" id="regex">
+                        </div>
+
+                        <div id="range-constraint" class="constraint-field">
+                            <label for="min">Min:</label>
+                            <input type="number" name="min" id="min">
+
+                            <label for="max">Max:</label>
+                            <input type="number" name="max" id="max">
+                        </div>
+
+                        <div id="list-constraint" class="constraint-field">
+                            <label for="list">List:</label>
+                            <input type="text" name="list" id="list">
+                        </div>
+                    </div>
+                    <!-- </form> -->
+                </div>
+            </form>
+            <div id="cy"></div>
+        </div>
+
+    </div>
+    <div id="cy"></div>
+    <script>
+        // get the schema,property-constraint map from the backend
+        let schema = {{ schema| tojson | safe }}
+        let propType = {{ propType| tojson | safe }}
+
+        // get the select elements from the DOM
+        let nodesSelect = document.getElementById('nodes')
+        let propertiesSelect = document.getElementById('properties')
+
+
+
+        // populate the nodes dropdown
+        for (let nodeType in schema.Nodes) {
+            let option = document.createElement('option')
+            option.value = nodeType
+            option.text = nodeType
+            nodesSelect.add(option)
+        }
+
+        // populate the properties dropdown based on the selected node type
+        nodesSelect.addEventListener('change', function () {
+            //remove the default option from nodes
+            const defaultToRemove = nodesSelect.querySelector(`option[value="${"null"}"]`);
+            if (defaultToRemove) {
+                nodesSelect.removeChild(defaultToRemove);
+            }
+
+            let nodeType = nodesSelect.value
+            propertiesSelect.innerHTML = ''  // clear the existing options
+            indicator = document.createElement('option') //add indicator asking to select a property
+            indicator.value = null
+            indicator.text = "---Select a property---"
+            propertiesSelect.add(indicator)
+            let properties = schema.Nodes[nodeType]
+            for (let prop in properties) {
+                let option = document.createElement('option')
+                option.value = prop
+                option.text = " <" + schema.Nodes[nodeType][prop]['type'] + "> " + prop
+                propertiesSelect.add(option)
+            }
+        })
+
+        function toggleDisplay(id) {
+            var x = document.getElementById(id);
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
+        }
+        //to display the propType input
+        propertiesSelect.addEventListener('change', function () {
+            //remove the default option from nodes
+            const defaultToRemove = propertiesSelect.querySelector(`option[value="${"null"}"]`);
+            if (defaultToRemove) {
+                propertiesSelect.removeChild(defaultToRemove);
+            }
+
+            let property = propertiesSelect.value;
+            let nodeType = nodesSelect.value;
+            let inputType = schema.Nodes[nodeType][property]['type'];
+            let constraintType = propType[inputType]['constraint'];
+
+            //putting appropriate constraint prefix
+            prefixField = document.getElementById('constraint-prefix')
+            prefixField.style.display = 'block'
+            prefixField.innerHTML = ''// clear the existing options
+            let prefixes = propType[inputType]['prefixes']
+            for (let idx in prefixes) {
+                let option = document.createElement('option')
+                option.value = prefixes[idx]
+                option.text = prefixes[idx]
+                prefixField.add(option)
+            }
+            //put appropriate constraint
+            for (let typ in propType) {
+                docElement = document.getElementById(propType[typ]['constraint'] + '-constraint')
+                docElement.style.display = (constraintType === propType[typ]['constraint']) ? 'block' : 'none'
+            }
+        });
+
+        //handle submission
+        cardInput = document.getElementById('query-form')
+        cardInput.addEventListener('submit', function (event) {
+            event.preventDefault()
+            let formData = new FormData(cardInput)
+            console.log("Creating Query.")
+            alert(formData)
+        })
+
+        //code for visualization
+        var cy = cytoscape({
+            container: document.getElementById('cy'),
+            elements: {
+                nodes: [
+                    { 'data': { 'id': 'a', 'label': 'Node A' } },
+                    { 'data': { 'id': 'b', 'label': 'Node B' } },
+                    { 'data': { 'id': 'c', 'label': 'Node C' } },
+                ],
+                edges: [
+                    { 'data': { 'source': 'a', 'target': 'b' } },
+                    { 'data': { 'source': 'b', 'target': 'c' } },
+                    { 'data': { 'source': 'c', 'target': 'a' } },
+                ]
+            },
+            style: [
+                {
+                    selector: 'node',
+                    style: {
+                        'background-color': '#666',
+                        'label': 'data(label)'
+                    }
+                },
+                {
+                    selector: 'edge',
+                    style: {
+                        'width': 3,
+                        'line-color': '#ccc'
+                    }
+                }
+            ],
+            layout: {
+                name: 'cose'
+            }
+        });
+    </script>
+
+
+
+</body>
+
+</html>
