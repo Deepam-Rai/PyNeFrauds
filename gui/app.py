@@ -1,8 +1,9 @@
-from flask import Flask, render_template, request, flash
+from flask import Flask, render_template, request, flash, jsonify
 
 import os
 from flask import send_from_directory
 
+from connector import gui_input_to_schema
 
 app = Flask(__name__)
 
@@ -77,6 +78,13 @@ def index():
         },
     }
     return render_template('index.html', schema=schema, propType=propType)
+
+@app.route('/create_query', methods=['POST'])
+def create_query():
+    form_data = request.form #get the form data
+    #process the form data
+    result = gui_input_to_schema(form_data)
+    return jsonify(result)
 
 @app.route('/neo4jLogin')
 def neo4j_login():
