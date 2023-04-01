@@ -3,153 +3,26 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Graph Dashboard</title>
-
-    <!-- Cytoscape.js library -->
-    <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
-
-    <!-- Custom styles -->
-    <style>
-        body {
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
-        .card-container {
-            /* display: flex; */
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            padding: 10px 15px 10px 15px;
-        }
-
-        .card {
-            background-color: #f0f0f0;
-            border-radius: 8px;
-            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-            padding: 24px 24px 10px 10px;
-        }
-
-        .constraint-card {
-            background-color: #f0f0f0;
-            border-radius: 8px;
-            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-            padding: 24px 24px 10px 10px;
-        }
-
-        h1 {
-            font-size: 24px;
-            margin: 0 0 16px 0;
-        }
-
-        form {
-            /* display: flex; */
-            flex-wrap: wrap;
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-
-        label {
-            font-weight: bold;
-            margin-right: 8px;
-        }
-
-        input,
-        select {
-            padding: 8px;
-            border: none;
-            border-radius: 4px;
-            background-color: #fff;
-            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        input[type="submit"] {
-            background-color: #007bff;
-            color: #fff;
-            cursor: pointer;
-        }
-
-        .constraint-input {
-            display: flex;
-        }
-
-        .constraint-prefix-container {
-            padding: 15px 15px 15px 15px;
-        }
-
-        .constraint-field {
-            display: none;
-            padding: 15px 15px 15px 15px;
-        }
-
-        #cy {
-            height: 500px;
-            border: 1px solid #ccc;
-            margin-top: 24px;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>GUI CYPHER Query Builder</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
 </head>
 
 <body>
-    <h1>Graph Dashboard</h1>
-    <div class="card-container">
-        <div class="card">
-            <form id="query-form">
-                <label for="nodes">Node:</label>
-                <select name="nodes" id="nodes">
-                    <option value="null">-- Select a node type --</option>
-                </select>
-                <input type="submit" value="Create">
-                <!-- </form> -->
-                <br>
-                <div class="constraint-card">
-                    <!-- <form> -->
-                    <label for="properties">Property:</label>
-                    <select name="properties" id="properties">
-                        <option value="null">-- Select a property --</option>
-                    </select>
-                    <div id="constraint-input" class="constraint-input">
-                        <div class='constraint-prefix-container'>
-                            <select name="constraint-prefix" id="constraint-prefix" style="display: none;">
-                            </select>
-                        </div>
+    <div id="master-container" class="master-container">
+        <div id="cards-container" class="cards-container">
 
-                        <div id="regex-constraint" class="constraint-field">
-                            <label for="regex">Regex:</label>
-                            <input type="text" name="regex" id="regex">
-                        </div>
-
-                        <div id="range-constraint" class="constraint-field">
-                            <label for="min">Min:</label>
-                            <input type="number" name="min" id="min">
-
-                            <label for="max">Max:</label>
-                            <input type="number" name="max" id="max">
-                        </div>
-
-                        <div id="list-constraint" class="constraint-field">
-                            <label for="list">List:</label>
-                            <input type="text" name="list" id="list">
-                        </div>
-                    </div>
-                    <!-- </form> -->
-                </div>
-            </form>
-            <div id="cy"></div>
         </div>
-
+        <button id="add-query-btn" class="add-query add-btn">+ Query</button>
     </div>
-    <div id="cy"></div>
+
+    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
     <script>
         // get the schema,property-constraint map from the backend
         let schema = {{ schema| tojson | safe }};
-        let propType = {{ propType| tojson | safe }};
+        let propConstrMap = {{ propConstrMap| tojson | safe }};
     </script>
-    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
-
-
-
 </body>
 
 </html>

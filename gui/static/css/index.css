@@ -1,0 +1,108 @@
+body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+.master-container {
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding: 10px 15px 10px 15px;
+}
+.card-container {
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding: 10px 15px 10px 15px;
+}
+
+.card {
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 24px 24px 10px 10px;
+}
+
+.query-card {
+    background-color: #d0d0d0;
+    border-radius: 8px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 24px 24px 10px 10px;
+    margin: 10px;
+}
+
+h1 {
+    font-size: 24px;
+    margin: 0 0 16px 0;
+}
+
+form {
+    /* display: flex; */
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+label {
+    font-weight: bold;
+    margin-right: 8px;
+}
+
+input,
+select {
+    padding: 8px;
+    border: none;
+    border-radius: 4px;
+    background-color: #fff;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+input[type="submit"],
+.add-btn {
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    margin: 8px 4px 4px 4px;
+    padding: 4px;
+}
+.add-btn:disabled {
+    background-color: gray;
+    color: white;
+    cursor: not-allowed;
+  }
+
+
+.constraints-container {
+    border: red;
+}
+.constraint-prefix,
+.property-options{
+    margin: 10px 10px 10px 10px;
+}
+
+.constraint-card {
+    padding: 10px 10px 10px 10px;
+    margin: 10px 10px 10px 10px;
+}
+
+.constraint-field {
+    display: flex;
+    padding: 10px 10px 10px 10px;
+}
+.core-constraint-field {
+    display: flex;
+    margin: 0px 10px 0px 10px;
+}
+.constraint-specs {
+    display: flex;
+    /* padding: 0px 10px 0px 10px; */
+    margin: 0px 10px 0px 10px;
+}
+
+#cy {
+    height: 500px;
+    border: 1px solid #ccc;
+    margin-top: 24px;
+}

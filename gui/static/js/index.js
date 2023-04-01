@@ -1,137 +1,242 @@
 // get the schema,property-constraint map from the backend
 //      done in html file
 
-// get the select elements from the DOM
-let nodesSelect = document.getElementById('nodes')
-let propertiesSelect = document.getElementById('properties')
 
-
-// populate the nodes dropdown
-for (let nodeType in schema.Nodes) {
-    let option = document.createElement('option')
-    option.value = nodeType
-    option.text = nodeType
-    nodesSelect.add(option)
-}
-
-// populate the properties dropdown based on the selected node type
-nodesSelect.addEventListener('change', function () {
-    //remove the default option from nodes
-    const defaultToRemove = nodesSelect.querySelector(`option[value="${"null"}"]`);
-    if (defaultToRemove) {
-        nodesSelect.removeChild(defaultToRemove);
+// get the parent element that contains all the cards
+const masterContainer = document.getElementById('master-container');
+// add event listener to the parent element
+masterContainer.addEventListener('change', function (event) {
+    const targetE = event.target;
+    console.log("something changed in " + targetE.id + "  of class(es) [" + targetE.classList + "].")
+    if (targetE.classList.contains("node-options")) {
+        nodeSelected(targetE.id)
     }
-
-    let nodeType = nodesSelect.value
-    propertiesSelect.innerHTML = ''  // clear the existing options
-    indicator = document.createElement('option') //add indicator asking to select a property
-    indicator.value = null
-    indicator.text = "---Select a property---"
-    propertiesSelect.add(indicator)
-    let properties = schema.Nodes[nodeType]
-    for (let prop in properties) {
-        let option = document.createElement('option')
-        option.value = prop
-        option.text = " <" + schema.Nodes[nodeType][prop]['type'] + "> " + prop
-        propertiesSelect.add(option)
+    else if (targetE.classList.contains("property-options")) {
+        propertySelected(targetE)
+    }
+});
+//for clicks on buttons
+masterContainer.addEventListener('click', function (event) {
+    let targetB = event.target
+    if (targetB.classList.contains("add-constraint-btn")) {
+        addConstraint(targetB)
     }
 })
 
-function toggleDisplay(id) {
-    var x = document.getElementById(id);
-    if (x.style.display === "none") {
-        x.style.display = "block";
-    } else {
-        x.style.display = "none";
+//ADD QUERY-CARD
+cardCount = 0;
+let addQueryBtn = document.getElementById('add-query-btn');
+addQueryBtn.addEventListener('click', function (event) {
+    //get the field
+    let field = document.getElementById('cards-container')
+    //create a card
+    let card = document.createElement('div')
+    card.classList.add('query-card')
+    let id = "query-card-" + cardCount
+    card.setAttribute('id', id)
+    //add the card
+    // field.insertBefore(card, field.lastElementChild);
+    field.appendChild(card);
+    //add node options to the card
+    addNodesOptions(id)
+    //add constraints-container
+    let constrContainer = document.createElement("div")
+    constrContainer.classList.add("constraints-container")
+    constrContainer.setAttribute("id", "constraints-container-" + cardCount)
+    //add container to the card
+    thisCard = document.getElementById(id)
+    thisCard.appendChild(constrContainer)
+    cardCount++;
+});
+
+function addNodesOptions(cardId) {
+    //get card component
+    let card = document.getElementById(cardId)
+    //create select list
+    let seList = document.createElement('select')
+    seList.classList.add('node-options')
+    let id = "node-options-" + cardCount
+    seList.setAttribute('id', id)
+    seList.setAttribute('name', id)
+    //populate node options
+    //put indicator default option first
+    let option = document.createElement('option')
+    option.value = "null"
+    option.text = "--select nodeType--"
+    seList.add(option)
+    for (let nodeType in schema.Nodes) {
+        let option = document.createElement('option')
+        option.value = nodeType
+        option.text = nodeType
+        seList.add(option)
+    }
+    //add the select list in card
+    card.appendChild(seList)
+}
+
+function nodeSelected(nodeId) {
+    let n = nodeId.split("-").pop()
+    //put the (+)constraint button if this is the first time changed
+    //  get the card first.
+    let cardId = "query-card-" + n
+    let card = document.getElementById(cardId)
+    let btnId = "add-constraint-btn-" + n
+    let addBtn = document.getElementById(btnId)
+    if (addBtn === null) {
+        let newBtn = document.createElement("button")
+        newBtn.classList.add("add-constraint-btn", "add-btn")
+        newBtn.setAttribute('id', "add-constraint-btn-" + n)
+        newBtn.setAttribute('type', "button")
+        newBtn.textContent = "+ Constraint"
+        card.appendChild(newBtn)
+    }
+    //empty the constraints-container
+    let constrContId = "constraints-container-" + n
+    let constrCont = document.getElementById(constrContId)
+    constrCont.innerHTML = ''
+    //remove the default --select node-- option if exists
+    let selNodes = document.getElementById(nodeId)
+    let toRemove = selNodes.querySelector(`option[value="${"null"}"]`);
+    if (toRemove) {
+        selNodes.removeChild(toRemove)
     }
 }
-//to display the propType input
-propertiesSelect.addEventListener('change', function () {
-    //remove the default option from nodes
-    const defaultToRemove = propertiesSelect.querySelector(`option[value="${"null"}"]`);
-    if (defaultToRemove) {
-        propertiesSelect.removeChild(defaultToRemove);
+
+//user clicked on +constraint button
+let constraintCount = 0
+function addConstraint(targetB) {
+    //constraints-field-<query-card-id>-<constraint-id>
+    let qId = targetB.id.split("-").pop()
+    let n = constraintCount
+    //get the constraints container
+    let constrContId = "constraints-container-" + qId
+    let constrCont = document.getElementById(constrContId)
+    //create a constraint field
+    let constrField = document.createElement("div")
+    let constrFieldId = "constraint-field-" + qId + "-" + n
+    constrField.classList.add("constraint-field")
+    constrField.setAttribute('id', constrFieldId)
+    //add contraint field to constraint container
+    constrCont.appendChild(constrField)
+    constraintCount++;
+    //populate the constrField with properties
+    populateProperties(constrFieldId)
+}
+
+function populateProperties(constrFieldId) {
+    console.log("need to populate for " + constrFieldId)
+    //first get which nodeType was selected
+    let qId = constrFieldId.split('-').slice(-2, -1)[0]
+    let nodeType = document.getElementById("node-options-" + qId).value
+    //get the constraint-field
+    let n = constrFieldId.split('-').pop()
+    let constrField = document.getElementById(constrFieldId)
+    //add select component
+    let id = "property-options-" + qId + "-" + n
+    //  1. first add label
+    let label = document.createElement("label")
+    label.setAttribute('for', id)
+    label.innerHTML = "Property"
+    constrField.appendChild(label)
+    //2. add select component
+    let seList = document.createElement("select")
+    seList.classList.add('property-options')
+    seList.setAttribute('id', id)
+    seList.setAttribute('name', id)
+    //3. populate prop options in the select
+    //  add default indicator value
+    let indicator = document.createElement('option') //add indicator asking to select a property
+    indicator.value = null
+    indicator.text = "---Select a property---"
+    seList.add(indicator)
+    for (let prop in schema.Nodes[nodeType]) {
+        let option = document.createElement('option')
+        option.value = prop
+        option.text = " <" + schema.Nodes[nodeType][prop]['type'] + "> " + prop
+        seList.add(option)
     }
+    constrField.appendChild(seList)
+    //add core-constraint-field
+    let coreConstrField = document.createElement("div")
+    coreConstrField.classList.add("core-constraint-field")
+    coreConstrField.setAttribute('id', "core-constraint-field-" + qId + "-" + n)
+    constrField.appendChild(coreConstrField)
+}
 
-    let property = propertiesSelect.value;
-    let nodeType = nodesSelect.value;
-    let inputType = schema.Nodes[nodeType][property]['type'];
-    let constraintType = propType[inputType]['constraint'];
 
-    //putting appropriate constraint prefix
-    prefixField = document.getElementById('constraint-prefix')
-    prefixField.style.display = 'block'
-    prefixField.innerHTML = ''// clear the existing options
-    let prefixes = propType[inputType]['prefixes']
+
+//HANDLING core constraints-----------------------
+
+function propertySelected(propSel) {
+    let qId = propSel.id.split('-').slice(-2, -1)[0]
+    let n = propSel.id.split('-').pop()
+    //get the property type
+    let propVal = propSel.value
+    //   get the node
+    let nodeType = document.getElementById("node-options-" + qId).value
+    let propType = schema.Nodes[nodeType][propVal]['type']
+    //  constraint type for that propType
+    let constrType = propConstrMap[propType]['constraint']
+    //get core-constraint-field
+    let coreField = document.getElementById("core-constraint-field-" + qId + "-" + n)
+    coreField.innerHTML = ''
+    //1.add constraint prefix
+    //  add label first
+    let label = document.createElement("label")
+    label.setAttribute('for', "constraint-prefix-" + qId + "-" + n)
+    label.innerHTML = "Prefix"
+    coreField.appendChild(label)
+
+    let constrPrefix = document.createElement("select")
+    constrPrefix.classList.add('constraint-prefix')
+    constrPrefix.setAttribute('id', "constraint-prefix-" + qId + "-" + n)
+    let prefixes = propConstrMap[propType]['prefixes']
     for (let idx in prefixes) {
         let option = document.createElement('option')
         option.value = prefixes[idx]
         option.text = prefixes[idx]
-        prefixField.add(option)
+        constrPrefix.add(option)
     }
-    //put appropriate constraint
-    for (let typ in propType) {
-        docElement = document.getElementById(propType[typ]['constraint'] + '-constraint')
-        docElement.style.display = (constraintType === propType[typ]['constraint']) ? 'block' : 'none'
-    }
-});
+    coreField.appendChild(constrPrefix)
 
-//handle submission
-cardInput = document.getElementById('query-form')
-cardInput.addEventListener('submit', function (event) {
-    event.preventDefault()
-    let formData = new FormData(cardInput)
-    //extract data from form
-    let data = {}
-    for (const [key, value] of formData.entries()) {
-        data[key]=value
-    }
-    console.log(data)
-    //process in backend and show result at frontend
-    fetch('/create_query', {
-        method: 'POST',
-        body: data
-    })
-        .then(response => response.json())
-        .then(data => {
-            //show in frontend
-            console.log(data)
-        })
-        .catch(error => console.error(error))
-})
 
-//code for visualization
-var cy = cytoscape({
-    container: document.getElementById('cy'),
-    elements: {
-        nodes: [
-            { 'data': { 'id': 'a', 'label': 'Node A' } },
-            { 'data': { 'id': 'b', 'label': 'Node B' } },
-            { 'data': { 'id': 'c', 'label': 'Node C' } },
-        ],
-        edges: [
-            { 'data': { 'source': 'a', 'target': 'b' } },
-            { 'data': { 'source': 'b', 'target': 'c' } },
-            { 'data': { 'source': 'c', 'target': 'a' } },
-        ]
-    },
-    style: [
-        {
-            selector: 'node',
-            style: {
-                'background-color': '#666',
-                'label': 'data(label)'
-            }
-        },
-        {
-            selector: 'edge',
-            style: {
-                'width': 3,
-                'line-color': '#ccc'
-            }
-        }
-    ],
-    layout: {
-        name: 'cose'
+    //add constraints
+    appendAppropConstr(coreField, propType, qId, n)
+    console.log(constrType)
+
+    //remove the default option --select property-- if it exists
+}
+function appendAppropConstr(coreField, propType, qId, n) {
+    let combId = qId + "-" + n
+    let constr = document.createElement("div")
+    constr.classList.add("constraint-specs")
+    constr.setAttribute("id", "constraint-specs-" + combId)
+    let constrType = propConstrMap[propType]['constraint']
+    constr.setAttribute("constraintType", constrType)
+    innerHTML = ""
+    switch (constrType) {
+        case "range":
+            innerHTML = `
+                <label for="min-${combId}">Min:</label>
+                <input type="number" name="min-${combId}" id="min-${combId}">
+
+                <label for="max-${combId}">Max:</label>
+                <input type="number" name="max-${combId}" id="max-${combId}">
+            `;
+            break;
+        case "list":
+            innerHTML = `
+                <label for="list-${combId}">List:</label>
+                <input type="text" name="list-${combId}" id="list-${combId}">`;
+            break;
+        case "regex":
+            innerHTML = `
+                <label for="regex-${combId}">Regex:</label>
+                <input type="text" name="regex-${combId}" id="regex-${combId}">
+            `;
+            break;
     }
-});
+    console.log(constrType)
+    constr.innerHTML = innerHTML
+    coreField.appendChild(constr)
+}

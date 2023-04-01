@@ -63,7 +63,7 @@ def index():
         }
     }
     #fetch constraints
-    propType = {
+    propConstrMap = {
         'int' : {
             'constraint':'range',
             'prefixes' : ['IS','IS NOT']
@@ -77,7 +77,7 @@ def index():
             'prefixes' : ['IN','NOT IN']
         },
     }
-    return render_template('index.html', schema=schema, propType=propType)
+    return render_template('index.html', schema=schema, propConstrMap=propConstrMap)
 
 @app.route('/create_query', methods=['POST'])
 def create_query():
