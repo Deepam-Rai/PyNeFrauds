@@ -54,7 +54,15 @@ input[type="submit"],
     color: white;
     cursor: not-allowed;
   }
-
+.generate-btn {
+    background-color: #8b0ad6;
+    color: #fff;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    margin: 8px 4px 4px 4px;
+    padding: 4px;
+}
 
 .constraints-container {
     border: red;
