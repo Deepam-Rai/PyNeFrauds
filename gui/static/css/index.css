@@ -9,19 +9,6 @@ body {
     height: 100vh;
     padding: 10px 15px 10px 15px;
 }
-.card-container {
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    padding: 10px 15px 10px 15px;
-}
-
-.card {
-    background-color: #f0f0f0;
-    border-radius: 8px;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 24px 24px 10px 10px;
-}
 
 .query-card {
     background-color: #d0d0d0;
@@ -36,16 +23,11 @@ h1 {
     margin: 0 0 16px 0;
 }
 
-form {
-    /* display: flex; */
-    flex-wrap: wrap;
-    gap: 16px;
-    margin-bottom: 16px;
-}
+
 
 label {
     font-weight: bold;
-    margin-right: 8px;
+    margin: 8px 8px 0px 10px;
 }
 
 input,
@@ -77,15 +59,6 @@ input[type="submit"],
 .constraints-container {
     border: red;
 }
-.constraint-prefix,
-.property-options{
-    margin: 10px 10px 10px 10px;
-}
-
-.constraint-card {
-    padding: 10px 10px 10px 10px;
-    margin: 10px 10px 10px 10px;
-}
 
 .constraint-field {
     display: flex;
@@ -93,12 +66,11 @@ input[type="submit"],
 }
 .core-constraint-field {
     display: flex;
-    margin: 0px 10px 0px 10px;
+    margin: 0px 0px 0px 20px;
 }
 .constraint-specs {
     display: flex;
-    /* padding: 0px 10px 0px 10px; */
-    margin: 0px 10px 0px 10px;
+    margin: 0px 0px 0px 20px;
 }
 
 #cy {

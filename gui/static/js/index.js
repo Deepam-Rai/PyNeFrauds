@@ -35,7 +35,6 @@ addQueryBtn.addEventListener('click', function (event) {
     let id = "query-card-" + cardCount
     card.setAttribute('id', id)
     //add the card
-    // field.insertBefore(card, field.lastElementChild);
     field.appendChild(card);
     //add node options to the card
     addNodesOptions(id)
@@ -50,12 +49,17 @@ addQueryBtn.addEventListener('click', function (event) {
 });
 
 function addNodesOptions(cardId) {
+    let id = "node-options-" + cardCount
     //get card component
     let card = document.getElementById(cardId)
+    //  add label first
+    let label = document.createElement("label")
+    label.setAttribute('for', id)
+    label.innerHTML = "Node"
+    card.appendChild(label)
     //create select list
     let seList = document.createElement('select')
     seList.classList.add('node-options')
-    let id = "node-options-" + cardCount
     seList.setAttribute('id', id)
     seList.setAttribute('name', id)
     //populate node options
