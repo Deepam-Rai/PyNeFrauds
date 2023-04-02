@@ -27,18 +27,18 @@ masterContainer.addEventListener('click', function (event) {
     }
 })
 
-function addGenerateBtn(){
+function addGenerateBtn() {
     //adds generate CYPHER query button if not already present
     let btnId = "generate"
     let btn = document.getElementById(btnId)
-    if (btn){
+    if (btn) {
         return
     }
     btn = document.createElement("button")
-    btn.setAttribute('id',btnId)
+    btn.setAttribute('id', btnId)
     btn.classList.add("generate-btn")
     btn.textContent = "Generate CYPHER"
-    let masterContainer=document.getElementById("master-container")
+    let masterContainer = document.getElementById("master-container")
     masterContainer.appendChild(btn)
 }
 
@@ -57,7 +57,7 @@ addQueryBtn.addEventListener('click', function (event) {
     //2. add entity meta specs
     let meta = document.createElement("div")
     meta.classList.add("entity-meta-container")
-    meta.setAttribute('id',"entity-meta-container-"+cardCount)
+    meta.setAttribute('id', "entity-meta-container-" + cardCount)
     //3.    add node options to the card-meta
     addNodesOptions(meta)
     card.appendChild(meta)
@@ -139,19 +139,20 @@ function addReference(qId) {
     if (ref) {
         return
     }
-    let metaField = document.getElementById("entity-meta-container-"+qId) 
+    let metaField = document.getElementById("entity-meta-container-" + qId)
     //create label
     let label = document.createElement("label")
-    label.setAttribute('for',refId)
+    label.setAttribute('for', refId)
     label.innerText = 'Reference:'
     metaField.appendChild(label)
     //create newRef
     let newRef = document.createElement('input')
-    newRef.setAttribute('type','text')
-    newRef.setAttribute('id',refId)
-    newRef.setAttribute('name',refId)
-    let value = "e"+qId
-    newRef.setAttribute('value',value)
+    newRef.setAttribute('type', 'text')
+    newRef.setAttribute('id', refId)
+    newRef.setAttribute('name', refId)
+    newRef.classList.add('reference')
+    let value = "e" + qId
+    newRef.setAttribute('value', value)
     metaField.appendChild(newRef)
 }
 
@@ -267,7 +268,7 @@ function appendAppropConstr(coreField, propType, qId, n) {
     constr.classList.add("constraint-specs")
     constr.setAttribute("id", "constraint-specs-" + combId)
     let constrType = propConstrMap[propType]['constraint']
-    constr.setAttribute("constraintType", constrType)
+    constr.setAttribute("constraint-type", constrType)
     innerHTML = ""
     switch (constrType) {
         case "range":
@@ -297,10 +298,95 @@ function appendAppropConstr(coreField, propType, qId, n) {
 
 
 //HANDLING submission----------------------
-function generate(){
+function generate() {
     //takes all the input
-    //passes to back-end
-    //waits for the response
-    //visualizes the response
-    console.info("time to work on the backend")
+    let queryCards = document.getElementById("master-container").querySelectorAll('.query-card')
+    let entities = []
+    queryCards.forEach(queryCard => {
+        let flag = false; //to add the entity or not
+        let entity = {};
+        //get entity label
+        let label = getLabel(queryCard)
+        if (label !== "null") {
+            console.log(label)
+            entity.label = label
+            //get entity references
+            entity.ref = getReference(queryCard)
+            //loop and get the constraints
+            let constrs = queryCard.querySelectorAll('.constraint-field')
+            constrs.forEach(constr => {
+                let value = constr.querySelector('.property-options').value
+                if (value !== "null") {
+                    let constrPrefix = constr.querySelector('.constraint-prefix').value
+                    let constrSpecs = getConstraintSpecs(constr)
+                    let constraint = [constrPrefix, constrSpecs]
+                    entity['Attributes'] = entity['Attributes'] ?? {};
+                    entity['Attributes'][value] = constraint
+                    flag = true;
+                }
+            })
+        }
+        if (flag === true) {
+            entities.push(entity)
+        }
+    });
+    console.log(entities)
+    fetch('/create_query', {
+        // passes to back-end
+        method:'POST',
+        headers:{
+            "Content-Type": "application/json"
+        },
+        body:JSON.stringify(entities)
+    })
+    .then( response => response.json())
+    .then( data => {
+        console.log("Got the data!",data)
+        //visualizes the response
+    })
+    .catch(error => {
+        console.error(error)
+    })
+}
+function getLabel(queryCardP) {
+    //queryCardP should be either queryCard or its id
+    let queryCard = typeof (queryCardP) === 'string' ? document.getElementById(queryCardP) : queryCardP
+    let nodeType = queryCard.querySelector('.node-options').value
+    return nodeType
+}
+function getReference(queryCardP) {
+    //queryCardP should be either queryCard or its id
+    let queryCard = typeof (queryCardP) === 'string' ? document.getElementById(queryCardP) : queryCardP
+    let ref = queryCard.querySelector('.reference').value
+    return ref
+}
+function getConstraintSpecs(constrFieldP) {
+    //constrFieldP is either dom object or id
+    //returns dict/str/list of constraint-specs
+    let constrField = typeof (constrFieldP) === 'string' ? document.getElementById(constrFieldP) : constrFieldP
+    let suffixId = constrField.id.split('-').slice(-2).join('-')
+    console.log(suffixId)
+    //determine type of constraint
+    let constrType = constrField.querySelector('.constraint-specs').getAttribute('constraint-type')
+    //get the constraint dict
+    let spec = null
+    switch (constrType) {
+        case 'range':
+            let max = constrField.querySelector('#max-' + suffixId).value
+            let min = constrField.querySelector('#min-' + suffixId).value
+            spec = { '>=': min, '<=': max }
+            break;
+        case 'regex':
+            spec = constrField.querySelector('#regex-' + suffixId).value
+            break;
+            case 'list':
+                spec = parseStringToArray(constrField.querySelector('#list-' + suffixId).value)
+            break;
+    }
+    return spec
+}
+function parseStringToArray(str) {
+    const delimiter = /(?<!\\),/; // match comma not preceded by backslash
+    const parts = str.split(delimiter).map(part => part.replace(/\\,/g, ',')); // replace escaped commas with comma
+    return parts;
 }
