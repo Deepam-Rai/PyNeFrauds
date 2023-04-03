@@ -5,6 +5,7 @@ import PyNeFrauds.PyNe as PyNe
 json_text = '''
 [{
   "NodeLabel" : "Patient",
+  "type" : "node",
   "Attributes" : {
     "Name" : ["IS NOT OF", "w"],
     "Contact" : ["IS", {">" : 9999999999}],
@@ -16,12 +17,11 @@ json_text = '''
   "NodeProperties" : {
     "OutDegree" : ["IS",{">":7}],
     "Neighbours" : ["IS", {"<":3}]
-  },  
-  "AttributeRelations" : {
   }
 },
 {
   "NodeLabel" : "Treatment",
+  "type" : "node",
   "Attributes" : {
     "Name" : ["IS OF", "w"],
     "Cost" : ["IS", {"=":5000}],
@@ -32,8 +32,6 @@ json_text = '''
   "NodeProperties" : {
     "OutDegree" : ["IS",{">":7}],
     "Neighbours" : ["IS", {"<":3}]
-  },  
-  "AttributeRelations" : {
   }
 }
 ]

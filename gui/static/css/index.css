@@ -11,7 +11,7 @@ body {
 }
 
 .query-card {
-    background-color: #d0d0d0;
+    background-color: #9dcef7;
     border-radius: 8px;
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
     padding: 24px 24px 10px 10px;
@@ -79,6 +79,15 @@ input[type="submit"],
 .constraint-specs {
     display: flex;
     margin: 0px 0px 0px 20px;
+}
+
+.cypher-display {
+    padding: 8px;
+    border: none;
+    border-radius: 4px;
+    background-color: rgb(195, 233, 255);
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    white-space: pre-wrap;
 }
 
 #cy {

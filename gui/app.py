@@ -42,7 +42,7 @@ def index():
 
 @app.route('/create_query', methods=['POST'])
 def create_query():
-    input_data = request  # get the form data
+    input_data = request.get_json()  # get the form data
     # process the form data
     result = gui_input_to_schema(input_data)
     return jsonify(result)

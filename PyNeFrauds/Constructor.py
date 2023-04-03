@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class ConstrType(Enum):
     NONE = None
     LIST = 0
@@ -7,7 +8,7 @@ class ConstrType(Enum):
     REGEX = 2
 
 
-################################################### START functions for constructing conditions
+# START functions for constructing conditions
 
 def mergeNodeConditions(queries, nRef, nLabel):
     '''queries: dict { priority level : list of sub-queries}
@@ -21,6 +22,7 @@ def mergeNodeConditions(queries, nRef, nLabel):
         query = ' OR '.join(queries[level])
         merged[level] = query
     return merged
+
 
 def constrType(restraint):
     '''Identify its type: range, regex, list, etc
@@ -38,6 +40,7 @@ def constrType(restraint):
         return ConstrType.REGEX
     return ConstrType.NONE
 
+
 def constrQuery(preCondition, restraint, nRef, aRef):
     '''
     preCondition: "IS", "IS NOT", "IN", "NOT IN".
@@ -53,16 +56,21 @@ def constrQuery(preCondition, restraint, nRef, aRef):
     else:
         query = ""
     query += "("+nRef+"."+aRef
-    if typ==ConstrType.LIST:
+    if typ == ConstrType.LIST:
         query += " IN " + str(restraint)
-    elif typ==ConstrType.RANGE:
-            query +=  f' {list(restraint.keys())[0]} {list(restraint.values())[0]} '
-    elif typ==ConstrType.REGEX:
+    elif typ == ConstrType.RANGE:
+        if len(restraint)>1:
+            query += " BETWEEN "
+            query += f' {restraint[">="]} AND {restraint["<="]} '
+        else:
+            query += f' {list(restraint.keys())[0]} {list(restraint.values())[0]} '
+    elif typ == ConstrType.REGEX:
         query += " =~ '" + restraint + "'"
     else:
         query = ""
     query += ')'
     return query
+
 
 def constrNodeCond(node, nRef='n'):
     '''node: a node's schema
@@ -70,30 +78,33 @@ def constrNodeCond(node, nRef='n'):
     Construct queries for a node.
     Returns:
     {
-        <int> level : [list of queries],
+        level : [list of queries],
         .
         .
     }'''
     queries = {}
+
     def addQuery(query, level):
         if level in queries:
             queries[level].append(query)
         else:
-            queries[level]=[query]
-    #Construct queries for attributes
+            queries[level] = [query]
+    # Construct queries for attributes
     for attribute in node['Attributes']:
         preCondition, restraint = node['Attributes'][attribute][:2]
-        restrLevel = 1 if len(node['Attributes'][attribute]) < 3 else node['Attributes'][attribute][2] #set default value of 1
+        # set default value of 1
+        restrLevel = 1 if len(node['Attributes'][attribute]) < 3 else node['Attributes'][attribute][2]
         query = constrQuery(preCondition, restraint, nRef, attribute)
         addQuery(query, restrLevel)
 
-    #TODO Construct queries for nodeProperties
-    #TODO Construct queries for attribute relationships
+    # TODO Construct queries for nodeProperties
 
-    query = mergeNodeConditions(queries=queries, nRef=nRef, nLabel=node['NodeLabel'])
+    query = mergeNodeConditions(
+        queries=queries, nRef=nRef, nLabel=node['NodeLabel'])
     return query
 
 ################################ END condition Constructing functions #########################
+
 
 def constrNodeQueries(nodeTests, nRef):
     '''<dict> nodeTests: tests on the node attributes
@@ -106,6 +117,7 @@ def constrNodeQueries(nodeTests, nRef):
         query += f' \nRETURN {nRef} \n'
         queries[level] = query
     return queries
+
 
 def constructQueries(jsonSchema, mode='STREAM'):
     '''
@@ -122,3 +134,22 @@ def constructQueries(jsonSchema, mode='STREAM'):
         nodeQueries = constrNodeQueries(nodeTests, nRef=nRef)
         queries[node['NodeLabel']] = nodeQueries
     return queries
+
+
+def all_in_one_query(entityList):
+    if len(entityList)==0:
+        return ""
+    # json input to queries
+    finalQuery = ''
+    for ent in entityList:
+        #match the entity
+        query = f'\nMATCH ({ent["ref"]}:{ent["NodeLabel"]})\n'
+        #where properties : conditions
+        entTests = constrNodeCond(ent, nRef=ent['ref'])
+        query += "  WHERE " + entTests[1]
+        finalQuery +="\n"+query
+    finalQuery = finalQuery[2:] + f'\nRETURN {entityList[0]["ref"]}'
+    for ent in entityList[1:]:
+        finalQuery += f', {ent["ref"]}'
+    # return all refs
+    return finalQuery

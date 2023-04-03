@@ -31,11 +31,14 @@ list[ # holds everything
 ]
 '''
 
+filteredSchema = {}
 for idx in schema:
     entity = schema[idx]
-    if entity['type']=='relationship':
-        count, type, properties = entity.values()
-        print(properties.keys())
-    elif entity['type']=='node':
-        relationships, count, type, properties, labels = entity.values()
-        print(properties.keys())
+    fEntity = {}
+    fEntity['type'] = entity['type']
+    fEntity['properties'] = entity['properties']
+    filteredSchema[idx] = fEntity
+
+
+
+print(filteredSchema)

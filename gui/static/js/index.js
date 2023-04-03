@@ -38,7 +38,7 @@ function addGenerateBtn() {
     btn = document.createElement("button")
     btn.setAttribute('id', btnId)
     btn.classList.add("generate-btn")
-    btn.textContent = "Generate CYPHER"
+    btn.textContent = "Get CYPHER"
     let masterContainer = document.getElementById("master-container")
     masterContainer.appendChild(btn)
 }
@@ -310,6 +310,8 @@ function generate() {
         let label = getLabel(queryCard)
         if (label !== "null") {
             entity.label = label
+            //get entity type
+            entity.type = schema[label]['type']
             //get entity references
             entity.ref = getReference(queryCard)
             //loop and get the constraints
@@ -330,18 +332,21 @@ function generate() {
             entities.push(entity)
         }
     });
+    //put CYPHER display if it doesnt exists
+    putCYPHERDisplay()
+    console.log("Sending Data:",entities)
     fetch('/create_query', {
         // passes to back-end
         method:'POST',
-        // headers:{
-        //     "Content-Type": "application/json"
-        // },
-        // body:JSON.stringify(entities)
-        body: entities //#TODO
+        headers:{
+            "Content-Type": "application/json"
+        },
+        body:JSON.stringify(entities)
     })
     .then( response => response.json())
     .then( data => {
         console.log("Got the data!",data)
+        updateCYPHERdisplay(data['CYPHER'])
         //visualizes the response
     })
     .catch(error => {
@@ -362,7 +367,7 @@ function getReference(queryCardP) {
 }
 function getConstraintSpecs(constrFieldP) {
     //constrFieldP is either dom object or id
-    //returns dict/str/list of constraint-specs
+    //returns constraint type, dict/str/list of constraint-specs
     let constrField = typeof (constrFieldP) === 'string' ? document.getElementById(constrFieldP) : constrFieldP
     let suffixId = constrField.id.split('-').slice(-2).join('-')
     //determine type of constraint
@@ -380,12 +385,31 @@ function getConstraintSpecs(constrFieldP) {
             break;
             case 'list':
                 spec = parseStringToArray(constrField.querySelector('#list-' + suffixId).value)
+                //#TODO change type if required
             break;
     }
     return spec
 }
 function parseStringToArray(str) {
     const delimiter = /(?<!\\),/; // match comma not preceded by backslash
-    const parts = str.split(delimiter).map(part => part.replace(/\\,/g, ',')); // replace escaped commas with comma
+    let parts = str.split(delimiter).map(part => part.replace(/\\,/g, ',')); // replace escaped commas with comma
+    parts = parts.map(part => part.trim());
     return parts;
+}
+
+function putCYPHERDisplay(){
+    let id = "cypher-display"
+    let cypherDis = document.getElementById(id)
+    if (cypherDis === null){
+        let cypherDis = document.createElement("div")
+        cypherDis.setAttribute('id',id)
+        cypherDis.setAttribute('name',id)
+        cypherDis.classList.add("cypher-display")
+        let masterCont = document.getElementById("master-container")
+        masterCont.appendChild(cypherDis)
+    }
+}
+function updateCYPHERdisplay(txt){
+    let cypherDis=document.getElementById("cypher-display")
+    cypherDis.innerHTML=txt
 }

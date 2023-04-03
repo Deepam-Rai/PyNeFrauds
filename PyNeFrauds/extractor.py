@@ -37,10 +37,6 @@ def verifyNodeProperties(nodeProps):
     #TODO: check if valid
     return nodeProps
 
-def verifyAttributeRelations(attrRels):
-    '''AttributeRelations should be of type dict.'''
-    #TODO: to think
-    return attrRels
 
 def verifyNode(node):
     '''node: a dict type.
@@ -56,9 +52,8 @@ def verifyNode(node):
     NodeLabel = verifyLabel(node['NodeLabel'])
     Attributes= verifyAttributes(node['Attributes'])
     NodeProperties = verifyNodeProperties(node['NodeProperties'])
-    AttributeRelations = verifyAttributeRelations(node['AttributeRelations'])
 
-    return {"NodeLabel":NodeLabel, 'Attributes':Attributes, "NodeProperties":NodeProperties, "AttributeRelations":AttributeRelations}
+    return {"NodeLabel":NodeLabel, 'Attributes':Attributes, "NodeProperties":NodeProperties}
 
 
 def verifySchema(nodesList):
