@@ -2,6 +2,9 @@
 
 # receives gui input; creates queries using codes; returns to gui
 
-def gui_input_to_schema(guiInput):
+import json
+
+def gui_input_to_schema(input):
     # [key,value] pairs of form input as dict
+    # print(json.parse(input))
     return {'CYPHER':'  TODO  '}

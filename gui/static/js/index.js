@@ -1,3 +1,4 @@
+//relations are also denoted/handled as "nodes" only
 // get the schema,property-constraint map from the backend
 //      done in html file
 
@@ -91,7 +92,7 @@ function addNodesOptions(entityMeta) {
     option.value = "null"
     option.text = "--select nodeType--"
     seList.add(option)
-    for (let nodeType in schema.Nodes) {
+    for (let nodeType in schema) {
         let option = document.createElement('option')
         option.value = nodeType
         option.text = nodeType
@@ -202,10 +203,10 @@ function populateProperties(constrFieldId) {
     indicator.value = null
     indicator.text = "---Select a property---"
     seList.add(indicator)
-    for (let prop in schema.Nodes[nodeType]) {
+    for (let prop in schema[nodeType]['properties']) {
         let option = document.createElement('option')
         option.value = prop
-        option.text = " <" + schema.Nodes[nodeType][prop]['type'] + "> " + prop
+        option.text = " <" + schema[nodeType]['properties'][prop]['type'] + "> " + prop
         seList.add(option)
     }
     constrField.appendChild(seList)
@@ -227,7 +228,7 @@ function propertySelected(propSel) {
     let propVal = propSel.value
     //   get the node
     let nodeType = document.getElementById("node-options-" + qId).value
-    let propType = schema.Nodes[nodeType][propVal]['type']
+    let propType = schema[nodeType]['properties'][propVal]['type']
     //  constraint type for that propType
     let constrType = propConstrMap[propType]['constraint']
     //get core-constraint-field
@@ -308,7 +309,6 @@ function generate() {
         //get entity label
         let label = getLabel(queryCard)
         if (label !== "null") {
-            console.log(label)
             entity.label = label
             //get entity references
             entity.ref = getReference(queryCard)
@@ -330,14 +330,14 @@ function generate() {
             entities.push(entity)
         }
     });
-    console.log(entities)
     fetch('/create_query', {
         // passes to back-end
         method:'POST',
-        headers:{
-            "Content-Type": "application/json"
-        },
-        body:JSON.stringify(entities)
+        // headers:{
+        //     "Content-Type": "application/json"
+        // },
+        // body:JSON.stringify(entities)
+        body: entities //#TODO
     })
     .then( response => response.json())
     .then( data => {
@@ -365,7 +365,6 @@ function getConstraintSpecs(constrFieldP) {
     //returns dict/str/list of constraint-specs
     let constrField = typeof (constrFieldP) === 'string' ? document.getElementById(constrFieldP) : constrFieldP
     let suffixId = constrField.id.split('-').slice(-2).join('-')
-    console.log(suffixId)
     //determine type of constraint
     let constrType = constrField.querySelector('.constraint-specs').getAttribute('constraint-type')
     //get the constraint dict

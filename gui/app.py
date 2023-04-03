@@ -3,88 +3,50 @@ from flask import Flask, render_template, request, flash, jsonify
 import os
 from flask import send_from_directory
 
+from schema_fetcher import NeoQuerer
 from connector import gui_input_to_schema
 
 app = Flask(__name__)
 
+host = 'bolt://localhost:11003'
+user = "neo4j"
+password = "password"
+querer = NeoQuerer(host, user,password)
+
+
 @app.route('/')
 def index():
-    # fetch the schema of the graph
-    schema = {
-        'Relationships':{
-            'RelType1':{
-                'prop1':{
-                    'type':'int',
-                    'value':1
-                },
-                'prop2':2
-            },
-            'RelType1':{
-                'prop1':{
-                    'type':'int',
-                    'value':1
-                },
-                'prop2':{
-                    'type':'int',
-                    'value':1
-                },
-                'prop3':{
-                    'type':'int',
-                    'value':1
-                }
-            }
-        },
-        'Nodes':{
-            'nodeType1':{
-                'prop1':{
-                    'type':'int',
-                    'value':1
-                },
-                'prop2':{
-                    'type':'str',
-                    'value':'someString'
-                }
-            },
-            'Patient':{
-                'Name':{
-                    'type':'str',
-                    'value':'Adam'
-                },
-                'prop2':{
-                    'type':'int',
-                    'value':1
-                },
-                'prop3':{
-                    'type':'list',
-                    'value': ['Male','Female','Other']
-                }
-            }
-
-        }
-    }
-    #fetch constraints
+    # fetch constraints
     propConstrMap = {
-        'int' : {
-            'constraint':'range',
-            'prefixes' : ['IS','IS NOT']
+        'INTEGER': {
+            'constraint': 'range',
+            'prefixes': ['IS', 'IS NOT']
         },
-        'str' : {
-            'constraint':'regex',
-            'prefixes' : ['IS OF','IS NOT OF']
+        'FLOAT': {
+            'constraint': 'range',
+            'prefixes': ['IS', 'IS NOT']
         },
-        'list': {
-            'constraint':'list',
-            'prefixes' : ['IN','NOT IN']
+        'STRING': {
+            'constraint': 'regex',
+            'prefixes': ['IS OF', 'IS NOT OF']
+        },
+        'LIST': {
+            'constraint': 'list',
+            'prefixes': ['IN', 'NOT IN']
         },
     }
+    # fetch the schema of the graph
+    schema = querer.get_processed_schema()
     return render_template('index.html', schema=schema, propConstrMap=propConstrMap)
+
 
 @app.route('/create_query', methods=['POST'])
 def create_query():
-    form_data = request.form #get the form data
-    #process the form data
-    result = gui_input_to_schema(form_data)
+    input_data = request  # get the form data
+    # process the form data
+    result = gui_input_to_schema(input_data)
     return jsonify(result)
+
 
 @app.route('/neo4jLogin')
 def neo4j_login():
@@ -95,9 +57,11 @@ def neo4j_login():
 def form():
     return render_template('form.html')
 
+
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/x-icon')
 
-if __name__=='__main__':
+
+if __name__ == '__main__':
     app.run(debug=True, port=8008)
