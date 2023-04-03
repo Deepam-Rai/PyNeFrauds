@@ -46,8 +46,6 @@ def gui_input_to_schema(input):
                 tattrs[attr] = [prefix,constr]
         tent['Attributes'] = tattrs
         tent['NodeProperties']={}
-        if (len(tent['Attributes'])>0):
-            # append only if some constraint really exists
-            tlist.append(tent)
+        tlist.append(tent)
     query = all_in_one_query(tlist) 
     return {'CYPHER':query}

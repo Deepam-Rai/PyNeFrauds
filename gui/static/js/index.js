@@ -16,6 +16,10 @@ masterContainer.addEventListener('change', function (event) {
         //put generate cypher button if not already present.
         addGenerateBtn()
     }
+    else if (targetE.classList.contains("relation-end")) {
+        //need to check if the end-vertex reference added to relationship is valid
+        relEndValidate(targetE)
+    }
 });
 //for clicks on buttons
 masterContainer.addEventListener('click', function (event) {
@@ -95,7 +99,8 @@ function addNodesOptions(entityMeta) {
     for (let nodeType in schema) {
         let option = document.createElement('option')
         option.value = nodeType
-        option.text = nodeType
+        let nodeOrRel = schema[nodeType]['type'] === 'node' ? '<node> ' : '<rel> '
+        option.text = nodeOrRel + nodeType
         seList.add(option)
     }
     //add the select list in card
@@ -107,7 +112,7 @@ function nodeSelected(nodeId) {
     let qId = n;
     let cardId = "query-card-" + n
     let card = document.getElementById(cardId)
-    //add reference for the node if not exists
+    //add reference for the node if not exists; also add source, destination field if its relation
     addReference(qId)
     //put the (+)constraint button if this is the first time changed
     //  get the card first.
@@ -135,6 +140,7 @@ function nodeSelected(nodeId) {
 function addReference(qId) {
     //adds entiry reference used for CYPHER query to entity-meta-container
     //if it doesnt exist already
+    //if relation then adds source and destination field also
     let refId = "reference-" + qId
     let ref = document.getElementById(refId)
     if (ref) {
@@ -155,6 +161,47 @@ function addReference(qId) {
     let value = "e" + qId
     newRef.setAttribute('value', value)
     metaField.appendChild(newRef)
+    //if it is relationship add source and destination field also
+    let isRel = schema[document.getElementById('node-options-' + qId).value]['type'] === 'relationship'
+    if (isRel) {
+        let fields = ['source', 'dest']
+        fields.forEach(field => {
+            //create label
+            let label = document.createElement("label")
+            label.setAttribute('for', field)
+            label.innerText = field + ':'
+            metaField.appendChild(label)
+            let inpt = document.createElement('input')
+            inpt.setAttribute('type', 'text')
+            inpt.setAttribute('id', field + '-' + qId)
+            inpt.classList.add('relation-end')
+            metaField.appendChild(inpt)
+        });
+    }
+}
+
+function relEndValidate(field) {
+    //checks if the end-vertex reference added for relationship is proper or not
+    //get valid references first
+    let refs = document.querySelectorAll('.reference')
+    let valRefs = []
+    refs.forEach(ref => {
+        let isNotRel = schema[ref.parentElement.querySelector('.node-options').value]['type'] !== 'relationship'
+        if (isNotRel) {
+            valRefs.push(ref.value)
+        }
+    })
+    if (!valRefs.includes(field.value)) {
+        //empty it
+        field.value = ''
+        //change color to red
+        field.style.backgroundColor = '#ffcece'
+        field.style.border = '2px solid #ff9b9b'
+    }
+    else {
+        field.style.backgroundColor = '#ffffff'
+        field.style.border = ''
+    }
 }
 
 //user clicked on +constraint button
@@ -312,9 +359,16 @@ function generate() {
             entity.label = label
             //get entity type
             entity.type = schema[label]['type']
+            //if it is relationship then get source and destination too
+            let qId = queryCard.id.split('-').pop()
+            if (entity.type === 'relationship') {
+                entity.source = document.getElementById('source-'+qId)
+                entity.dest = document.getElementById('dest-' + qId)
+            }
             //get entity references
             entity.ref = getReference(queryCard)
             //loop and get the constraints
+            entity['Attributes'] = {};
             let constrs = queryCard.querySelectorAll('.constraint-field')
             constrs.forEach(constr => {
                 let value = constr.querySelector('.property-options').value
@@ -322,36 +376,33 @@ function generate() {
                     let constrPrefix = constr.querySelector('.constraint-prefix').value
                     let constrSpecs = getConstraintSpecs(constr)
                     let constraint = [constrPrefix, constrSpecs]
-                    entity['Attributes'] = entity['Attributes'] ?? {};
                     entity['Attributes'][value] = constraint
                     flag = true;
                 }
             })
         }
-        if (flag === true) {
-            entities.push(entity)
-        }
+        entities.push(entity)
     });
     //put CYPHER display if it doesnt exists
     putCYPHERDisplay()
-    console.log("Sending Data:",entities)
+    console.log("Sending Data:", entities)
     fetch('/create_query', {
         // passes to back-end
-        method:'POST',
-        headers:{
+        method: 'POST',
+        headers: {
             "Content-Type": "application/json"
         },
-        body:JSON.stringify(entities)
+        body: JSON.stringify(entities)
     })
-    .then( response => response.json())
-    .then( data => {
-        console.log("Got the data!",data)
-        updateCYPHERdisplay(data['CYPHER'])
-        //visualizes the response
-    })
-    .catch(error => {
-        console.error(error)
-    })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Got the data!", data)
+            updateCYPHERdisplay(data['CYPHER'])
+            //visualizes the response
+        })
+        .catch(error => {
+            console.error(error)
+        })
 }
 function getLabel(queryCardP) {
     //queryCardP should be either queryCard or its id
@@ -383,9 +434,9 @@ function getConstraintSpecs(constrFieldP) {
         case 'regex':
             spec = constrField.querySelector('#regex-' + suffixId).value
             break;
-            case 'list':
-                spec = parseStringToArray(constrField.querySelector('#list-' + suffixId).value)
-                //#TODO change type if required
+        case 'list':
+            spec = parseStringToArray(constrField.querySelector('#list-' + suffixId).value)
+            //#TODO change type if required
             break;
     }
     return spec
@@ -397,19 +448,19 @@ function parseStringToArray(str) {
     return parts;
 }
 
-function putCYPHERDisplay(){
+function putCYPHERDisplay() {
     let id = "cypher-display"
     let cypherDis = document.getElementById(id)
-    if (cypherDis === null){
+    if (cypherDis === null) {
         let cypherDis = document.createElement("div")
-        cypherDis.setAttribute('id',id)
-        cypherDis.setAttribute('name',id)
+        cypherDis.setAttribute('id', id)
+        cypherDis.setAttribute('name', id)
         cypherDis.classList.add("cypher-display")
         let masterCont = document.getElementById("master-container")
         masterCont.appendChild(cypherDis)
     }
 }
-function updateCYPHERdisplay(txt){
-    let cypherDis=document.getElementById("cypher-display")
-    cypherDis.innerHTML=txt
+function updateCYPHERdisplay(txt) {
+    let cypherDis = document.getElementById("cypher-display")
+    cypherDis.innerHTML = txt
 }

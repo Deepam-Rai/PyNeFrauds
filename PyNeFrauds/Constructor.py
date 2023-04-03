@@ -145,8 +145,9 @@ def all_in_one_query(entityList):
         #match the entity
         query = f'\nMATCH ({ent["ref"]}:{ent["NodeLabel"]})\n'
         #where properties : conditions
-        entTests = constrNodeCond(ent, nRef=ent['ref'])
-        query += "  WHERE " + entTests[1]
+        if len(ent['Attributes'])>0:
+            entTests = constrNodeCond(ent, nRef=ent['ref'])
+            query += "  WHERE " + entTests[1]
         finalQuery +="\n"+query
     finalQuery = finalQuery[2:] + f'\nRETURN {entityList[0]["ref"]}'
     for ent in entityList[1:]:
