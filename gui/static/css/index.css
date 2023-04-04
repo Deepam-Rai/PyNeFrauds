@@ -63,8 +63,19 @@ input[type="submit"],
     margin: 8px 4px 4px 4px;
     padding: 4px;
 }
+.del-btn {
+    background-color: #d33030;
+    color: #fff;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    margin: 8px 4px 4px 4px;
+    padding: 4px;
+}
+}
 
 .constraints-container {
+    display: flex;
     border: red;
 }
 

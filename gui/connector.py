@@ -37,6 +37,9 @@ def gui_input_to_schema(input):
         tent['NodeLabel'] = entity['label']
         tent['ref'] = entity['ref']
         tent['type'] = entity['type']
+        if tent['type']=="relationship":
+            tent['source']=entity['source']
+            tent['dest']=entity['dest']
         tattrs = {}
         for attr in entity['Attributes']:
             specs = entity['Attributes'][attr]

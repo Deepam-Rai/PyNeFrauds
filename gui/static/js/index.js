@@ -30,6 +30,9 @@ masterContainer.addEventListener('click', function (event) {
     else if (targetB.id === "generate") {
         generate()
     }
+    else if (targetB.classList.contains("del-btn")) {
+        handleDelete(targetB)
+    }
 })
 
 function addGenerateBtn() {
@@ -63,6 +66,8 @@ addQueryBtn.addEventListener('click', function (event) {
     let meta = document.createElement("div")
     meta.classList.add("entity-meta-container")
     meta.setAttribute('id', "entity-meta-container-" + cardCount)
+    //Add delete button
+    addDeleteButton(meta, cardCount, cardOrConstr = "card")
     //3.    add node options to the card-meta
     addNodesOptions(meta)
     card.appendChild(meta)
@@ -180,6 +185,36 @@ function addReference(qId) {
     }
 }
 
+function addDeleteButton(cont, id, cardOrConstr) {
+    let newBtn = document.createElement("button")
+    newBtn.classList.add("del-btn")
+    newBtn.setAttribute('type', "button")
+    if (cardOrConstr === "card") {
+        newBtn.classList.add('delete-query-card-btn')
+        newBtn.setAttribute('id', "del-query-card-btn-" + id)
+        newBtn.textContent = "Delete"
+    }
+    else if (cardOrConstr === 'constr') {
+        newBtn.classList.add('delete-constr-btn')
+        newBtn.setAttribute('id', "del-constr-btn-" + id)
+        newBtn.textContent = "Delete"
+    }
+    cont.appendChild(newBtn)
+}
+function handleDelete(btn) {
+    let toDel = null
+    if (btn.classList.contains('delete-query-card-btn')) {
+        let id = btn.id.split('-').pop()
+        toDel = document.getElementById('query-card-' + id)
+    }
+    else if (btn.classList.contains('delete-constr-btn')) {
+        let id = btn.id.split('-').slice(-2).join('-')
+        toDel = document.getElementById('constraint-field-' + id)
+    }
+    toDel.remove()
+}
+
+
 function relEndValidate(field) {
     //checks if the end-vertex reference added for relationship is proper or not
     //get valid references first
@@ -219,6 +254,7 @@ function addConstraint(targetB) {
     constrField.classList.add("constraint-field")
     constrField.setAttribute('id', constrFieldId)
     //add contraint field to constraint container
+    addDeleteButton(constrField, qId = qId +'-'+n, cardOrConstr = 'constr')
     constrCont.appendChild(constrField)
     constraintCount++;
     //populate the constrField with properties
@@ -356,14 +392,15 @@ function generate() {
         //get entity label
         let label = getLabel(queryCard)
         if (label !== "null") {
+            console.log("label is not null:",label)
             entity.label = label
             //get entity type
             entity.type = schema[label]['type']
             //if it is relationship then get source and destination too
             let qId = queryCard.id.split('-').pop()
             if (entity.type === 'relationship') {
-                entity.source = document.getElementById('source-'+qId)
-                entity.dest = document.getElementById('dest-' + qId)
+                entity.source = document.getElementById('source-' + qId).value
+                entity.dest = document.getElementById('dest-' + qId).value
             }
             //get entity references
             entity.ref = getReference(queryCard)
@@ -380,8 +417,8 @@ function generate() {
                     flag = true;
                 }
             })
+            entities.push(entity)
         }
-        entities.push(entity)
     });
     //put CYPHER display if it doesnt exists
     putCYPHERDisplay()
@@ -406,7 +443,7 @@ function generate() {
 }
 function getLabel(queryCardP) {
     //queryCardP should be either queryCard or its id
-    let queryCard = typeof (queryCardP) === 'string' ? document.getElementById(queryCardP) : queryCardP
+    let queryCard = typeof(queryCardP) === 'string' ? document.getElementById(queryCardP) : queryCardP
     let nodeType = queryCard.querySelector('.node-options').value
     return nodeType
 }

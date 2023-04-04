@@ -142,8 +142,12 @@ def all_in_one_query(entityList):
     # json input to queries
     finalQuery = ''
     for ent in entityList:
+        print(f'{ent["NodeLabel"]}')
         #match the entity
-        query = f'\nMATCH ({ent["ref"]}:{ent["NodeLabel"]})\n'
+        if ent['type']=='node':
+            query = f'\nMATCH ({ent["ref"]}:{ent["NodeLabel"]})\n'
+        elif ent['type']=='relationship':
+            query = f'\nMATCH ({ent["source"]})-[{ent["ref"]}]-({ent["dest"]})\n'
         #where properties : conditions
         if len(ent['Attributes'])>0:
             entTests = constrNodeCond(ent, nRef=ent['ref'])
