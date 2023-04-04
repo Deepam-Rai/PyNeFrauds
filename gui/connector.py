@@ -14,8 +14,8 @@ from PyNeFrauds.Constructor import all_in_one_query
 
 def rectifyConstraint(constr):
     # returns constr modified if required
-    print(type(constr))
     if isinstance(constr, str): #regex
+        constr = ''.join([e for e in constr if e!=''])
         if len(constr)>0:
             return constr
     if isinstance(constr, list): #list
@@ -25,7 +25,6 @@ def rectifyConstraint(constr):
     if isinstance(constr, dict): #range
         constr = {k:v for k,v in constr.items() if v.isdecimal()}
         if bool(constr):
-            print(constr)
             return constr
     return None
 
@@ -40,13 +39,14 @@ def gui_input_to_schema(input):
         if tent['type']=="relationship":
             tent['source']=entity['source']
             tent['dest']=entity['dest']
-        tattrs = {}
-        for attr in entity['Attributes']:
-            specs = entity['Attributes'][attr]
-            prefix = specs[0]
-            constr = rectifyConstraint(specs[1])
+        tattrs = []
+        for specs in entity['Attributes']:
+            # specs = entity['Attributes'][attr]
+            attr = specs[0][0]
+            prefix = specs[1][0]
+            constr = rectifyConstraint(specs[1][1])
             if constr is not None:
-                tattrs[attr] = [prefix,constr]
+                tattrs.append([attr,prefix,constr])
         tent['Attributes'] = tattrs
         tent['NodeProperties']={}
         tlist.append(tent)

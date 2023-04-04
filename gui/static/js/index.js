@@ -392,7 +392,6 @@ function generate() {
         //get entity label
         let label = getLabel(queryCard)
         if (label !== "null") {
-            console.log("label is not null:",label)
             entity.label = label
             //get entity type
             entity.type = schema[label]['type']
@@ -405,7 +404,7 @@ function generate() {
             //get entity references
             entity.ref = getReference(queryCard)
             //loop and get the constraints
-            entity['Attributes'] = {};
+            entity['Attributes'] = []
             let constrs = queryCard.querySelectorAll('.constraint-field')
             constrs.forEach(constr => {
                 let value = constr.querySelector('.property-options').value
@@ -413,7 +412,7 @@ function generate() {
                     let constrPrefix = constr.querySelector('.constraint-prefix').value
                     let constrSpecs = getConstraintSpecs(constr)
                     let constraint = [constrPrefix, constrSpecs]
-                    entity['Attributes'][value] = constraint
+                    entity['Attributes'].push([[value], constraint])
                     flag = true;
                 }
             })

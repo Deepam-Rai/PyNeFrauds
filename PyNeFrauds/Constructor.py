@@ -90,11 +90,11 @@ def constrNodeCond(node, nRef='n'):
         else:
             queries[level] = [query]
     # Construct queries for attributes
-    for attribute in node['Attributes']:
-        preCondition, restraint = node['Attributes'][attribute][:2]
+    for idx in node['Attributes']:
+        attr, preCondition, restraint = idx[:3]
         # set default value of 1
-        restrLevel = 1 if len(node['Attributes'][attribute]) < 3 else node['Attributes'][attribute][2]
-        query = constrQuery(preCondition, restraint, nRef, attribute)
+        restrLevel = 1 if len(idx) < 4 else idx[-1]
+        query = constrQuery(preCondition, restraint, nRef, attr)
         addQuery(query, restrLevel)
 
     # TODO Construct queries for nodeProperties
@@ -142,16 +142,15 @@ def all_in_one_query(entityList):
     # json input to queries
     finalQuery = ''
     for ent in entityList:
-        print(f'{ent["NodeLabel"]}')
         #match the entity
         if ent['type']=='node':
-            query = f'\nMATCH ({ent["ref"]}:{ent["NodeLabel"]})\n'
+            query = f'\nMATCH ({ent["ref"]}:{ent["NodeLabel"]})'
         elif ent['type']=='relationship':
-            query = f'\nMATCH ({ent["source"]})-[{ent["ref"]}]-({ent["dest"]})\n'
+            query = f'\nMATCH ({ent["source"]})-[{ent["ref"]}:{ent["NodeLabel"]}]-({ent["dest"]})'
         #where properties : conditions
         if len(ent['Attributes'])>0:
             entTests = constrNodeCond(ent, nRef=ent['ref'])
-            query += "  WHERE " + entTests[1]
+            query += "\n  WHERE " + entTests[1]
         finalQuery +="\n"+query
     finalQuery = finalQuery[2:] + f'\nRETURN {entityList[0]["ref"]}'
     for ent in entityList[1:]:

@@ -2,6 +2,9 @@ import PyNeFrauds.PyNe as PyNe
 # from PyNeFrauds.Constructor import testFun
 # from PyNeFrauds.extractor import verifyAttributeProperties
 
+
+# does not allow duplicate keys - attributes
+# change to array of dicts.
 json_text = '''
 [{
   "NodeLabel" : "Patient",
