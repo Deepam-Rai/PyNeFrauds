@@ -3,11 +3,16 @@ body {
     margin: 0;
     padding: 0;
 }
+
 .master-container {
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    padding: 10px 15px 10px 15px;
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 85%;
+    height: 50%;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
 .query-card {
@@ -49,11 +54,13 @@ input[type="submit"],
     margin: 8px 4px 4px 4px;
     padding: 4px;
 }
+
 .add-btn:disabled {
     background-color: gray;
     color: white;
     cursor: not-allowed;
-  }
+}
+
 .generate-btn {
     background-color: #8b0ad6;
     color: #fff;
@@ -63,6 +70,7 @@ input[type="submit"],
     margin: 8px 4px 4px 4px;
     padding: 4px;
 }
+
 .del-btn {
     background-color: #d33030;
     color: #fff;
@@ -72,10 +80,10 @@ input[type="submit"],
     margin: 8px 4px 4px 4px;
     padding: 4px;
 }
-}
+
 
 .constraints-container {
-    display: flex;
+    /* display: flex; */
     border: red;
 }
 
@@ -83,10 +91,12 @@ input[type="submit"],
     display: flex;
     padding: 10px 10px 10px 10px;
 }
+
 .core-constraint-field {
     display: flex;
     margin: 0px 0px 0px 20px;
 }
+
 .constraint-specs {
     display: flex;
     margin: 0px 0px 0px 20px;
@@ -99,6 +109,7 @@ input[type="submit"],
     background-color: rgb(195, 233, 255);
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
     white-space: pre-wrap;
+    margin-bottom: 100px;
 }
 
 #cy {

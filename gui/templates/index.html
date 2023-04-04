@@ -1,28 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'base.html' %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>GUI CYPHER Query Builder</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
-</head>
+{% block head %}
+{{ super() }}
+<title>GUI CYPHER Query Builder</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+{% endblock %}
 
-<body>
-    <div id="master-container" class="master-container">
-        <div id="cards-container" class="cards-container">
+{% block content %}
+<div id="master-container" class="master-container">
+    <div id="cards-container" class="cards-container">
 
-        </div>
-        <button id="add-query-btn" class="add-query add-btn">+ Query</button>
     </div>
+    <button id="add-query-btn" class="add-query add-btn">+ Query</button>
+</div>
 
-    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
-    <script>
-        // get the schema,property-constraint map from the backend
-        let schema = {{ schema| tojson | safe }};
-        let propConstrMap = {{ propConstrMap| tojson | safe }};
-    </script>
-</body>
-
-</html>
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+<script>
+    // get the schema,property-constraint map from the backend
+    let schema = {{ schema| tojson | safe }};
+    let propConstrMap = {{ propConstrMap| tojson | safe }};
+</script>
+{% endblock %}
