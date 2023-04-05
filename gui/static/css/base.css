@@ -23,25 +23,54 @@ nav .logo {
 	text-decoration: none;
 }
 
+nav {
+	background-color: #333;
+	/* Set the background color of the navigation bar */
+}
+
 nav ul {
+	list-style-type: none;
+	/* Remove the bullet points from the list items */
+	margin: 0;
+	/* Remove the default margin */
+	padding: 0;
+	/* Remove the default padding */
 	display: flex;
+	/* Use flexbox to position the list items */
 }
 
-nav ul li {
-	margin-left: 20px;
+nav li {
+	flex: 1;
+	/* Distribute the available space evenly between the list items */
+	text-align: center;
+	/* Center the text within each list item */
+	transition: background-color 0.3s ease;
+	/* Add a smooth transition when hovering over the list items */
 }
 
-nav ul li:first-child {
-	margin-left: 0;
+nav li:hover {
+	background-color: #555;
+	/* Change the background color of the list item when hovered over */
+	font-weight: bold;
+	/* Make the text more bold when hovered over */
 }
 
-nav ul li a {
+nav a {
+	display: block;
+	/* Make the entire area of the list item clickable */
+	padding: 10px;
+	/* Add some padding to the list items for better visibility */
 	color: #fff;
-	font-size: 18px;
+	/* Set the color of the text */
 	text-decoration: none;
-	text-transform: uppercase;
+	/* Remove the underline from the links */
+	transition: color 0.3s ease;
+	/* Add a smooth transition when hovering over the links */
 }
 
-nav ul li a:hover {
+nav a:hover {
 	color: #ff0;
+	/* Change the color of the link when hovered over */
+	font-weight: bold;
+	/* Make the text more bold when hovered over */
 }

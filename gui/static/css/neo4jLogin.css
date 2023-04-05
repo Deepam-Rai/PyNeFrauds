@@ -4,13 +4,18 @@ body {
 }
 
 form {
-	margin: 0 auto;
-	max-width: 400px;
+	/* margin: auto auto; */
+	max-width: 600px;
 	padding: 20px;
 	background-color: #fff;
 	border: 1px solid #ddd;
 	border-radius: 5px;
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+	width: 50%;
 }
 
 h1 {
@@ -23,7 +28,8 @@ label {
 	margin-bottom: 10px;
 }
 
-input[type="text"], input[type="password"] {
+input[type="text"],
+input[type="password"] {
 	display: block;
 	width: 100%;
 	padding: 10px;
@@ -42,4 +48,17 @@ input[type="submit"] {
 	border: none;
 	border-radius: 5px;
 	cursor: pointer;
+}
+
+.error {
+	display: none;
+	background-color: #fff;
+	border-radius: 5px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	color: red;
+	border: 1px solid red;
+	padding: 10px;
+	margin: 10px auto;
+	width: 30%;
+	text-align: center;
 }

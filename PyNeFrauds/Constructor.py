@@ -59,11 +59,10 @@ def constrQuery(preCondition, restraint, nRef, aRef):
     if typ == ConstrType.LIST:
         query += " IN " + str(restraint)
     elif typ == ConstrType.RANGE:
-        if len(restraint)>1:
-            query += " BETWEEN "
-            query += f' {restraint[">="]} AND {restraint["<="]} '
-        else:
-            query += f' {list(restraint.keys())[0]} {list(restraint.values())[0]} '
+        query += f' {list(restraint.keys())[0]} {list(restraint.values())[0]} '
+        if len(restraint) > 1:
+            query += f' AND {nRef}.{aRef} '
+            query += f'{list(restraint.keys())[1]} {list(restraint.values())[1]} '
     elif typ == ConstrType.REGEX:
         query += " =~ '" + restraint + "'"
     else:
@@ -137,21 +136,21 @@ def constructQueries(jsonSchema, mode='STREAM'):
 
 
 def all_in_one_query(entityList):
-    if len(entityList)==0:
+    if len(entityList) == 0:
         return ""
     # json input to queries
     finalQuery = ''
     for ent in entityList:
-        #match the entity
-        if ent['type']=='node':
+        # match the entity
+        if ent['type'] == 'node':
             query = f'\nMATCH ({ent["ref"]}:{ent["NodeLabel"]})'
-        elif ent['type']=='relationship':
+        elif ent['type'] == 'relationship':
             query = f'\nMATCH ({ent["source"]})-[{ent["ref"]}:{ent["NodeLabel"]}]-({ent["dest"]})'
-        #where properties : conditions
-        if len(ent['Attributes'])>0:
+        # where properties : conditions
+        if len(ent['Attributes']) > 0:
             entTests = constrNodeCond(ent, nRef=ent['ref'])
             query += "\n  WHERE " + entTests[1]
-        finalQuery +="\n"+query
+        finalQuery += "\n"+query
     finalQuery = finalQuery[2:] + f'\nRETURN {entityList[0]["ref"]}'
     for ent in entityList[1:]:
         finalQuery += f', {ent["ref"]}'

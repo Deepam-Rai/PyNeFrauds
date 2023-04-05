@@ -82,6 +82,25 @@ addQueryBtn.addEventListener('click', function (event) {
 });
 
 function addNodesOptions(entityMeta) {
+    //check if schema is empty
+    if (!loggedIn['value']){
+        console.log("error")
+        let errDiv = document.createElement("div")
+        errDiv.classList.add("error")
+        errDiv.setAttribute("id",'not-logged-in-error')
+        errDiv.innerHTML = "Please log into neo4j first." + '<br><a href="/neo4j_login" style="color: blue;">Go to login page</a>'
+        errDiv.style.display='block'
+        entityMeta.appendChild(errDiv)
+        return
+    }
+    else {
+        console.log("no-error")
+        let errDiv = document.getElementById('not-logged-in-error')
+        if (errDiv){
+            errDiv.remove()
+        }
+    }
+
     let id = "node-options-" + cardCount
     //get card component
     // let card = document.getElementById(cardId)

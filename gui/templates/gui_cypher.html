@@ -3,7 +3,7 @@
 {% block head %}
 {{ super() }}
 <title>GUI CYPHER Query Builder</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/gui_cypher.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -14,9 +14,10 @@
     <button id="add-query-btn" class="add-query add-btn">+ Query</button>
 </div>
 
-<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+<script src="{{ url_for('static', filename='js/gui_cypher.js') }}"></script>
 <script>
     // get the schema,property-constraint map from the backend
+    let loggedIn = {{ logIn| tojson | safe }};
     let schema = {{ schema| tojson | safe }};
     let propConstrMap = {{ propConstrMap| tojson | safe }};
 </script>

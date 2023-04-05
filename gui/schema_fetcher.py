@@ -17,6 +17,20 @@ class NeoQuerer():
             result = session.run(query, params)
             return [record.data() for record in result]
 
+    def setCredentials(self, host, user, password=None):
+        self.host = host
+        self.user = user
+        self.password = password
+        return
+    
+    def validateCredentials(self, password=None):
+        password = self.password if password is None else password
+        try:
+            driver = GraphDatabase.driver(self.host, auth=(self.user, password))
+            return True
+        except Exception as e:
+            return False
+    
     def get_schema(self, password=None):
         query = 'CALL apoc.meta.schema()'
         result = self.neo4j_query(query=query, password=password)
