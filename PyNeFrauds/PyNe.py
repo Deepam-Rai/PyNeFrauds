@@ -1,6 +1,7 @@
 from .extractor import extractSchema
-from .Constructor import constructQueries
+from .Constructor import constructQueries, all_in_one_query
 
+import json
     
 class PyNe():
     '''This class is a master controller/coordinator.
@@ -10,7 +11,7 @@ class PyNe():
         jsonString: A string following json format, the schema will be extracted from this.
 
         '''
-        self.schema = extractSchema(jsonString)
+        self.schema = extractSchema(jsonString, verify=False)
         self.extractMetadata()
         self.constructQueries()
     
@@ -21,18 +22,24 @@ class PyNe():
         self.numTypes = len(self.schema) #number of node types
         self.nodeTypes = [node['NodeLabel'] for node in self.schema]
 
-    def constructQueries(self):
+    def constructQueries(self, mode="INDIVIDUAL"):
         '''From self.schema
         constructs CYPHER queries for fraud detection.'''
-        self.queries = constructQueries(self.schema)
+        if mode=="INDIVIDUAL":
+            self.queries = constructQueries(self.schema)
+        elif mode=="MERGED":
+            self.queries = all_in_one_query(self.schema)
         return
 
     def showQueries(self):
-        for node, nodeQueries in self.queries.items():
-            print(f'\nNode: {node}')
-            for level, query in nodeQueries.items():
-                print(f'Level: {level}')
-                print(query)
+        if isinstance(self.queries, dict):
+            for node, nodeQueries in self.queries.items():
+                print(f'\nNode: {node}')
+                for level, query in nodeQueries.items():
+                    print(f'Level: {level}')
+                    print(query)
+        else:
+            print(self.queries)
 
 
 

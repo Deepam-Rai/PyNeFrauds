@@ -22,11 +22,11 @@ def verifyAttributes(attributes):
         }
         returns: attributes with modifications if needed.
     '''
-    if not isinstance(attributes, dict):
-        raise TypeError("attributes should be of type dict")
-    result = {}
+    if not isinstance(attributes, list):
+        raise TypeError("attributes should be of type list")
+    result = []
     for attribute in attributes:
-        result[attribute] = verifyAttributeProperties(attributes[attribute])
+        result.append(verifyAttributeProperties(attribute))
     return result
 
 def verifyNodeProperties(nodeProps):
@@ -71,12 +71,13 @@ def verifySchema(nodesList):
 
 
 
-def extractSchema(jsonString):
+def extractSchema(jsonString, verify=True):
     '''Given a jsonString, extracts schema for PyNe.
     jsonString should confirm to standard json format.
     Returns: A list of nodes schemas as dicts.
     '''
     #TODO: Check if jsonString is tooo large or smth. Vulnerability: might stall/crash program.
     parsedJson = json.loads(jsonString)
-    parsedJson = verifySchema(parsedJson)
+    if verify:
+        parsedJson = verifySchema(parsedJson)
     return parsedJson

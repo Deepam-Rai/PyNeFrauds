@@ -79,6 +79,11 @@ def validate_credentials():
 def form():
     return render_template('neovis.html')
 
+@app.route('/graphylitic')
+def graphylitic():
+    return render_template('graphylitic.html')
+
+
 
 @app.route('/favicon.ico')
 def favicon():

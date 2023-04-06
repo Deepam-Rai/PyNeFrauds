@@ -1,0 +1,43 @@
+<html>
+<head>
+	<style>
+		body{ margin: 0; background-color: #ddd; }
+		.nodeSelector{ width: 19%; height: 100%; display: inline-block; font-family: Arial; }
+		.title{ font-size: 16px; font-weight: bold; margin: 15px; }
+		.nodeToClick{ padding: 15px; font-size: 12px; }
+		.nodeToClick:hover{ background-color: #eee; cursor: pointer; }
+		#graphlytic_frame{ border: none; float: right; width: 80%; height: 100%; display: none; }
+	</style>
+	<script>
+		function nodeClicked(uuid){
+			let cypher = encodeURI('MATCH p=(n)-[r*1..8]->(b) WHERE n.uuid="' + uuid + '" RETURN p');
+			let graphlytic = document.getElementById('graphlytic_frame');
+			graphlytic.style.display='block';
+			graphlytic.src = "https://your.graphlytic/visualization/?cq=" + cypher;
+		}
+	</script>
+</head>
+<body>
+	
+	<div class="nodeSelector">
+		<div class="title">Visualize infrastructure for a selected node</div>
+		<div href="#" onClick="nodeClicked('7b30a949-5b15-4705-a92a-fa7e1538365f')" class="nodeToClick">
+			Application Component 9445
+		</div>
+		<div href="#" onClick="nodeClicked('3f1f3064-d79f-4307-865d-6971df81e6c9')" class="nodeToClick">
+			Database 55426
+		</div>
+		<div href="#" onClick="nodeClicked('a40214d4-277f-438a-8b53-48f92f95ba5a')" class="nodeToClick">
+			Failover Cluster 239540
+		</div>
+		<div href="#" onClick="nodeClicked('6cb9af3c-24ed-43d7-9da2-05eeec355cbf')" class="nodeToClick">
+			Security Device 94387
+		</div>
+	</div>
+		
+	<iframe id="graphlytic_frame" 
+		src="https://your.graphlytic/visualization?iframe-authentication&username=admin&password=admin">
+	</iframe>
+	
+</body>
+</html>

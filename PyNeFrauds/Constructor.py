@@ -151,7 +151,7 @@ def all_in_one_query(entityList):
             entTests = constrNodeCond(ent, nRef=ent['ref'])
             query += "\n  WHERE " + entTests[1]
         finalQuery += "\n"+query
-    finalQuery = finalQuery[2:] + f'\nRETURN {entityList[0]["ref"]}'
+    finalQuery = finalQuery[2:] + f'\n\nRETURN {entityList[0]["ref"]}'
     for ent in entityList[1:]:
         finalQuery += f', {ent["ref"]}'
     # return all refs
