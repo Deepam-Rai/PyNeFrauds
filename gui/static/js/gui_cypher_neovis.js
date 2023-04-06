@@ -1,11 +1,28 @@
 // in gui_cypher specifically handles the visualization part.
 
+//instantiating neovis viz object with credentials; has security issues
+var viz;
+console.log(neoCreds)
+var config = {
+    containerId: "viz",
+    neo4j: neoCreds,
+    labels: {},
+    relationships: {},
+    initialCypher: ""
+};
+console.log(config)
+var options = {
+    width: (window.innerWidth - 25) + "px",
+    height: (window.innerHeight - 75) + "px"
+};
+viz = new NeoVis.default(config);
+
+
 function createGraph(cypher) {
     //append graph field if not already done
     appendGraphField()
     setConfig()
-    console.log("Visualizing CYPHER:",cypher)
-    viz.renderWithCypher(cypher, {initial:true},800,600);
+    viz.renderWithCypher(cypher, { initial: true }, 800, 600);
 }
 
 function appendGraphField() {
@@ -22,24 +39,6 @@ function appendGraphField() {
     }
 }
 
-var viz;
-
 function setConfig() {
-    //#TODO take credentials from backend
-    var config = {
-        containerId: "viz",
-        neo4j: {
-            serverUrl: "bolt://localhost:11003",
-            serverUser: "neo4j",
-            serverPassword: "password"
-        },
-        labels: {},
-        relationships: {},
-        initialCypher: ""
-    };
-    var options = {
-        width: (window.innerWidth - 25) + "px",
-                height: (window.innerHeight - 75) + "px"
-      };
-    viz = new NeoVis.default(config);
+    //set some config
 }

@@ -41,7 +41,12 @@ def gui_cypher():
     else:
         logIn = {'value':True}
         schema = querer.get_processed_schema()
-    return render_template('gui_cypher.html',logIn=logIn, schema=schema, propConstrMap=propConstrMap)
+    neoCreds = {
+            "serverUrl": querer.host,
+            "serverUser": querer.user,
+            "serverPassword": querer.password
+        }
+    return render_template('gui_cypher.html',logIn=logIn, schema=schema, propConstrMap=propConstrMap, neoCreds=neoCreds)
 
 
 @app.route('/create_query', methods=['POST'])
@@ -74,6 +79,10 @@ def validate_credentials():
         # Credentials are invalid, return an error message
         return jsonify({'success': False, 'error': 'Invalid credentials'}), 401
 
+@app.route('/neo4jCredentials')
+def getNeo4jCredentials():
+    
+    return jsonify(neo4j)
 
 @app.route('/form')
 def form():

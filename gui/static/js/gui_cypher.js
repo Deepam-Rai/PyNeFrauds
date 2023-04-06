@@ -74,6 +74,8 @@ let addQueryBtn = document.getElementById('add-query-btn');
 addQueryBtn.addEventListener('click', function (event) {
     //get the field
     let field = document.getElementById('cards-container')
+    //add the output LIMIT div if not present
+    addOutputLimit(field)
     //create a card
     let card = document.createElement('div')
     card.classList.add('query-card')
@@ -98,6 +100,17 @@ addQueryBtn.addEventListener('click', function (event) {
     thisCard.appendChild(constrContainer)
     cardCount++;
 });
+function addOutputLimit(cont){
+    console.log("addding output limit")
+    let opDiv = document.getElementById('output-limit')
+    if (opDiv === null){
+        let opDiv = document.createElement("div")
+        opDiv.classList.add("output-limit")
+        opDiv.setAttribute('id','output-limit')
+        opDiv.innerHTML = "TODO some limit"
+        cont.appendChild(opDiv)
+    }
+}
 
 function addNodesOptions(entityMeta) {
     //check if schema is empty
