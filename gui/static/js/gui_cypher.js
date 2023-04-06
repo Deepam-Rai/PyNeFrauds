@@ -15,6 +15,7 @@ masterContainer.addEventListener('change', function (event) {
         propertySelected(targetE)
         //put generate cypher button if not already present.
         addGenerateBtn()
+        addGetGraphBtn()
     }
     else if (targetE.classList.contains("relation-end")) {
         //need to check if the end-vertex reference added to relationship is valid
@@ -26,6 +27,9 @@ masterContainer.addEventListener('click', function (event) {
     let targetB = event.target
     if (targetB.classList.contains("add-constraint-btn")) {
         addConstraint(targetB)
+    }
+    else if (targetB.id === "get-graph-btn") {
+        getGraph()
     }
     else if (targetB.id === "generate") {
         generate()
@@ -46,6 +50,20 @@ function addGenerateBtn() {
     btn.setAttribute('id', btnId)
     btn.classList.add("generate-btn")
     btn.textContent = "Get CYPHER"
+    let masterContainer = document.getElementById("master-container")
+    masterContainer.appendChild(btn)
+}
+function addGetGraphBtn() {
+    //adds generate CYPHER query button if not already present
+    let btnId = "get-graph-btn"
+    let btn = document.getElementById(btnId)
+    if (btn) {
+        return
+    }
+    btn = document.createElement("button")
+    btn.setAttribute('id', btnId)
+    btn.classList.add("get-graph-btn")
+    btn.textContent = "Visualize"
     let masterContainer = document.getElementById("master-container")
     masterContainer.appendChild(btn)
 }
@@ -83,20 +101,18 @@ addQueryBtn.addEventListener('click', function (event) {
 
 function addNodesOptions(entityMeta) {
     //check if schema is empty
-    if (!loggedIn['value']){
-        console.log("error")
+    if (!loggedIn['value']) {
         let errDiv = document.createElement("div")
         errDiv.classList.add("error")
-        errDiv.setAttribute("id",'not-logged-in-error')
+        errDiv.setAttribute("id", 'not-logged-in-error')
         errDiv.innerHTML = "Please log into neo4j first." + '<br><a href="/neo4j_login" style="color: blue;">Go to login page</a>'
-        errDiv.style.display='block'
+        errDiv.style.display = 'block'
         entityMeta.appendChild(errDiv)
         return
     }
     else {
-        console.log("no-error")
         let errDiv = document.getElementById('not-logged-in-error')
-        if (errDiv){
+        if (errDiv) {
             errDiv.remove()
         }
     }
@@ -273,7 +289,7 @@ function addConstraint(targetB) {
     constrField.classList.add("constraint-field")
     constrField.setAttribute('id', constrFieldId)
     //add contraint field to constraint container
-    addDeleteButton(constrField, qId = qId +'-'+n, cardOrConstr = 'constr')
+    addDeleteButton(constrField, qId = qId + '-' + n, cardOrConstr = 'constr')
     constrCont.appendChild(constrField)
     constraintCount++;
     //populate the constrField with properties
@@ -402,6 +418,7 @@ function appendAppropConstr(coreField, propType, qId, n) {
 
 //HANDLING submission----------------------
 function generate() {
+    //Generates the CYPHER query
     //takes all the input
     let queryCards = document.getElementById("master-container").querySelectorAll('.query-card')
     let entities = []
@@ -461,7 +478,7 @@ function generate() {
 }
 function getLabel(queryCardP) {
     //queryCardP should be either queryCard or its id
-    let queryCard = typeof(queryCardP) === 'string' ? document.getElementById(queryCardP) : queryCardP
+    let queryCard = typeof (queryCardP) === 'string' ? document.getElementById(queryCardP) : queryCardP
     let nodeType = queryCard.querySelector('.node-options').value
     return nodeType
 }
@@ -511,11 +528,56 @@ function putCYPHERDisplay() {
         cypherDis.setAttribute('id', id)
         cypherDis.setAttribute('name', id)
         cypherDis.classList.add("cypher-display")
+        let cypherField = document.createElement("div") //holds cypher
+        cypherField.classList.add("cypher-field")
+        cypherField.setAttribute('id', 'cypher-field')
+        cypherDis.appendChild(cypherField)
         let masterCont = document.getElementById("master-container")
         masterCont.appendChild(cypherDis)
     }
 }
 function updateCYPHERdisplay(txt) {
-    let cypherDis = document.getElementById("cypher-display")
+    let cypherDis = document.getElementById("cypher-field")
     cypherDis.innerHTML = txt
 }
+
+//Visualizing the graph
+// there is a separate .js file to handle this. below function is just a connector
+function getGraph() {
+    //takes the CYPHER; gets the graph
+    //create the cypher first
+    generate()
+    //get the cypher from the cypher field; it may take sometime to generate cypher
+    let cypher = ""
+    waitForCypher()
+    .then((cypher) => {
+        createGraph(cypher)
+    })
+    .catch((err) => {
+        console.error("Some error occurred:",err);
+    });
+}
+
+function waitForCypher() {
+    return new Promise((resolve, reject) => {
+        let cypherField = document.getElementById('cypher-field');
+        let cypher = cypherField.textContent.trim();
+        if (cypher === "") {
+            let intervalId = setInterval(function () {
+                cypher = cypherField.textContent.trim();
+                if (cypher !== "") {
+                    clearInterval(intervalId);
+                    resolve(cypher);
+                }
+            }, 100);
+
+            setTimeout(function () {
+                clearInterval(intervalId);
+                reject(new Error("Timeout expired"));
+            }, 3000);
+        } else {
+            resolve(cypher);
+        }
+    });
+}
+

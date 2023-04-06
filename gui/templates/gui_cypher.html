@@ -15,10 +15,19 @@
 </div>
 
 <script src="{{ url_for('static', filename='js/gui_cypher.js') }}"></script>
+<script src="{{ url_for('static', filename='js/gui_cypher_neovis.js') }}"></script>
+
 <script>
     // get the schema,property-constraint map from the backend
     let loggedIn = {{ logIn| tojson | safe }};
     let schema = {{ schema| tojson | safe }};
     let propConstrMap = {{ propConstrMap| tojson | safe }};
 </script>
+
+<!-- For neovis visualization -->
+<script src="https://unpkg.com/neovis.js@2.0.2"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"
+    integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+
+
 {% endblock %}

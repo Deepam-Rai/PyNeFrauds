@@ -15,7 +15,7 @@ json_text = '''
     ["Contact", "IS", {">" : 9999999999}],
     ["Age", "IS NOT", {"<=":130}],
     ["asdf", "IS", {"<":23, ">=":14}],
-    ["ID", "IS", {"<":0}],
+    ["ID", "IS NOT", {"<":0}],
     ["Gender", "NOT IN", ["Male","Female","Others"]]
   ],
   "NodeProperties" : {}

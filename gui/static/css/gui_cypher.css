@@ -1,20 +1,18 @@
 body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    margin: 0;
-    padding: 0;
 }
 
 .error {
-	display: none;
-	background-color: #fff;
-	border-radius: 5px;
-	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-	color: red;
-	border: 1px solid red;
-	padding: 10px;
-	margin: 10px auto;
-	width: 30%;
-	text-align: center;
+    display: none;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    color: red;
+    border: 1px solid red;
+    padding: 10px;
+    margin: 10px auto;
+    width: 30%;
+    text-align: center;
 }
 
 .master-container {
@@ -74,6 +72,7 @@ input[type="submit"],
     cursor: not-allowed;
 }
 
+.get-graph-btn,
 .generate-btn {
     background-color: #8b0ad6;
     color: #fff;
@@ -122,13 +121,17 @@ input[type="submit"],
     background-color: rgb(195, 233, 255);
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
     white-space: pre-wrap;
-    margin-bottom: 100px;
 }
 
 
-
-#cy {
-    height: 500px;
-    border: 1px solid #ccc;
-    margin-top: 24px;
+#viz {
+    width: 900px;
+    height: 700px;
+    border: none;
+    border-radius: 4px;
+    background-color: rgb(238, 248, 253);
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    /* border: 1px solid lightgray; */
+    font: 22pt arial;
+    margin: 10px auto;
 }

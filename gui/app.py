@@ -77,13 +77,7 @@ def validate_credentials():
 
 @app.route('/form')
 def form():
-    return render_template('neovis.html')
-
-@app.route('/graphylitic')
-def graphylitic():
-    return render_template('graphylitic.html')
-
-
+    return render_template('visualizer.html')
 
 @app.route('/favicon.ico')
 def favicon():
@@ -94,4 +88,4 @@ def index():
     return neo4j_login()
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8008)
+    app.run(debug=True, host='0.0.0.0', port=8008)
