@@ -2,24 +2,41 @@
 
 //instantiating neovis viz object with credentials; has security issues
 var viz;
-console.log(neoCreds)
 var config = {
     containerId: "viz",
     neo4j: neoCreds,
+    visConfig: {
+        nodes: {
+            color: 'red',
+            font: {
+                strokeWidth : 0,
+                color: '#ffffff',
+                size: 20,
+                face: 'Open Sans'
+            }
+        },
+        edges: {
+            arrows: {
+                to: { enabled: true }
+            }
+        },
+    },
     labels: {},
     relationships: {}
 };
-console.log(config)
 var options = {
     width: (window.innerWidth - 25) + "px",
     height: (window.innerHeight - 75) + "px"
 };
 
+
+
 function createGraph(cypher) {
     //append graph field if not already done
     appendGraphField()
+    config.labels = getLabelsConfig()
+    console.log(config)
     viz = new NeoVis.default(config);
-    setConfig()
     viz.renderWithCypher(cypher, { initial: true }, 800, 600);
 }
 
@@ -36,7 +53,22 @@ function appendGraphField() {
         metaCont.appendChild(graphField)
     }
 }
+console.log(schema)
 
-function setConfig() {
-    //set some config
+function getLabelsConfig() {
+    //set the size of nodes
+    let labelsConfig = {}
+    for (let ent in schema){
+        if (schema[ent]['type']==='node'){
+            nodeConfig = {'label': 'project_name'}
+            nodeConfig["[NeoVis.NEOVIS_ADVANCED_CONFIG]"] = {
+                cypher : {
+                    size : "MATCH (n) WHERE id(n) = $id RETURN n.size"
+                }
+            }
+            labelsConfig[ent] = nodeConfig
+
+        }
+    }
+    return labelsConfig
 }

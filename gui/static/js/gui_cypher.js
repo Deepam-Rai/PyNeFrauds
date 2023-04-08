@@ -106,7 +106,7 @@ function addOutputLimit(cont) {
         let opDiv = document.createElement("div")
         opDiv.classList.add("output-limit")
         opDiv.setAttribute('id', 'output-limit')
-        
+
         let id = 'output-limit-field'
         //create label
         let label = document.createElement("label")
@@ -205,36 +205,36 @@ function nodeSelected(nodeId) {
 }
 function addReference(qId) {
     //adds entiry reference used for CYPHER query to entity-meta-container
-    //if it doesnt exist already
     //if relation then adds source and destination field also
+    let metaField = document.getElementById("entity-meta-container-" + qId)
     let refId = "reference-" + qId
     let ref = document.getElementById(refId)
-    if (ref) {
-        return
+    if (!ref) {
+        //create label
+        let label = document.createElement("label")
+        label.setAttribute('for', refId)
+        label.innerText = 'Reference:'
+        metaField.appendChild(label)
+        //create newRef
+        let newRef = document.createElement('input')
+        newRef.setAttribute('type', 'text')
+        newRef.setAttribute('id', refId)
+        newRef.setAttribute('name', refId)
+        newRef.classList.add('reference')
+        let value = "e" + qId
+        newRef.setAttribute('value', value)
+        metaField.appendChild(newRef)
     }
-    let metaField = document.getElementById("entity-meta-container-" + qId)
-    //create label
-    let label = document.createElement("label")
-    label.setAttribute('for', refId)
-    label.innerText = 'Reference:'
-    metaField.appendChild(label)
-    //create newRef
-    let newRef = document.createElement('input')
-    newRef.setAttribute('type', 'text')
-    newRef.setAttribute('id', refId)
-    newRef.setAttribute('name', refId)
-    newRef.classList.add('reference')
-    let value = "e" + qId
-    newRef.setAttribute('value', value)
-    metaField.appendChild(newRef)
-    //if it is relationship add source and destination field also
+    //if it is relationship add source and destination field also if not present
     let isRel = schema[document.getElementById('node-options-' + qId).value]['type'] === 'relationship'
-    if (isRel) {
+    let source = document.getElementById('source-'+qId)
+    let dest = document.getElementById('dest-'+qId)
+    if (isRel && !source && !dest) {
         let fields = ['source', 'dest']
         fields.forEach(field => {
             //create label
             let label = document.createElement("label")
-            label.setAttribute('for', field)
+            label.setAttribute('for', field+'-'+qId)
             label.innerText = field + ':'
             metaField.appendChild(label)
             let inpt = document.createElement('input')
@@ -243,6 +243,14 @@ function addReference(qId) {
             inpt.classList.add('relation-end')
             metaField.appendChild(inpt)
         });
+    }
+    else if(!isRel && source && dest){
+        //also remove their labels
+        document.querySelector(`label[for="${source.id}"]`).remove()
+        document.querySelector(`label[for="${dest.id}"]`).remove()
+        //remove if present
+        source.remove()
+        dest.remove()
     }
 }
 
