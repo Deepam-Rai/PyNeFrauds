@@ -26,6 +26,7 @@ body {
     box-sizing: border-box;
 }
 
+.output-limit,
 .query-card {
     background-color: #9dcef7;
     border-radius: 8px;

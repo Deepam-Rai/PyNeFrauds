@@ -7,20 +7,18 @@ var config = {
     containerId: "viz",
     neo4j: neoCreds,
     labels: {},
-    relationships: {},
-    initialCypher: ""
+    relationships: {}
 };
 console.log(config)
 var options = {
     width: (window.innerWidth - 25) + "px",
     height: (window.innerHeight - 75) + "px"
 };
-viz = new NeoVis.default(config);
-
 
 function createGraph(cypher) {
     //append graph field if not already done
     appendGraphField()
+    viz = new NeoVis.default(config);
     setConfig()
     viz.renderWithCypher(cypher, { initial: true }, 800, 600);
 }

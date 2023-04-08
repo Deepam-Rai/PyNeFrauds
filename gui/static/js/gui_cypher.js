@@ -100,14 +100,27 @@ addQueryBtn.addEventListener('click', function (event) {
     thisCard.appendChild(constrContainer)
     cardCount++;
 });
-function addOutputLimit(cont){
-    console.log("addding output limit")
+function addOutputLimit(cont) {
     let opDiv = document.getElementById('output-limit')
-    if (opDiv === null){
+    if (opDiv === null) {
         let opDiv = document.createElement("div")
         opDiv.classList.add("output-limit")
-        opDiv.setAttribute('id','output-limit')
-        opDiv.innerHTML = "TODO some limit"
+        opDiv.setAttribute('id', 'output-limit')
+        
+        let id = 'output-limit-field'
+        //create label
+        let label = document.createElement("label")
+        label.setAttribute('for', id)
+        label.innerText = 'LIMIT '
+        opDiv.appendChild(label)
+        //create input field
+        let limIp = document.createElement('input')
+        limIp.setAttribute('type', 'number')
+        limIp.setAttribute('id', id)
+        limIp.setAttribute('name', id)
+        limIp.classList.add('output-limit-field')
+        limIp.setAttribute('value', 25)
+        opDiv.appendChild(limIp)
         cont.appendChild(opDiv)
     }
 }
@@ -482,7 +495,8 @@ function generate() {
         .then(response => response.json())
         .then(data => {
             console.log("Got the data!", data)
-            updateCYPHERdisplay(data['CYPHER'])
+            let limit = " LIMIT " + document.getElementById('output-limit-field').value
+            updateCYPHERdisplay(data['CYPHER'] + limit)
             //visualizes the response
         })
         .catch(error => {
@@ -563,12 +577,12 @@ function getGraph() {
     //get the cypher from the cypher field; it may take sometime to generate cypher
     let cypher = ""
     waitForCypher()
-    .then((cypher) => {
-        createGraph(cypher)
-    })
-    .catch((err) => {
-        console.error("Some error occurred:",err);
-    });
+        .then((cypher) => {
+            createGraph(cypher)
+        })
+        .catch((err) => {
+            console.error("Some error occurred:", err);
+        });
 }
 
 function waitForCypher() {
