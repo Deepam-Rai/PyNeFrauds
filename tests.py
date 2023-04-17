@@ -1,4 +1,7 @@
-import PyNeFrauds.PyNe as PyNe
+# from PyNeFrauds.Globals import neo4jHandler
+import PyNeFrauds
+import PyNeFrauds.QueryConstructor as QueryConstructor
+from PyNeFrauds.GNN import EmbedFetcher
 # from PyNeFrauds.Constructor import testFun
 # from PyNeFrauds.extractor import verifyAttributeProperties
 
@@ -36,8 +39,15 @@ json_text = '''
 '''
 
 
-cone = PyNe(json_text)
+# print(PyNeFrauds.Globals.neo4jHandler.get_credentials())
+
+# cone = QueryConstructor(json_text)
 # print(cone.queries)
 # print(cone.queries['Patient'][1])
-cone.constructQueries(mode='MERGED')
-cone.showQueries()
+# cone.constructQueries(mode='MERGED')
+# cone.showQueries()
+
+PyNeFrauds.Globals.neo4jHandler.set_credentials("bolt://localhost:11003", "neo4j","password")
+x = PyNeFrauds.GNN.EmbedFetcher(embedProperty="GraphSage", uniqueID="project_id", target="fraud")
+REF_INDEX, featureMatrix, edge_index, targets = x.fetchData()
+print(edge_index)

@@ -1,9 +1,10 @@
+from .Globals import *
 from .extractor import extractSchema
 from .Constructor import constructQueries, all_in_one_query
 
 import json
     
-class PyNe():
+class QueryConstructor():
     '''This class is a master controller/coordinator.
     It uses extractor.py to verify and extract the schema from jsonString.'''
     def __init__(self, jsonString):

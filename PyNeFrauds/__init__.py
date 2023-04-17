@@ -1,1 +1,2 @@
-from .PyNe import PyNe
+from .Globals import *
+from .QueryConstructor import QueryConstructor

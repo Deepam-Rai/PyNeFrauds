@@ -1,0 +1,2 @@
+from .EmbedFetcher import EmbedFetcher
+
