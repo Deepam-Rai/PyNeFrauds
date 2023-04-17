@@ -14,7 +14,7 @@ json_text = '''
     ["Name", "IS NOT OF", "w"],
     ["Contact", "IS", {">" : 9999999999}],
     ["Age", "IS NOT", {"<=":130}],
-    ["asdf", "IS", {"<":23, ">=":14}],
+    ["asdf", "IS", {"<":23, ">=":"n1.Cost"}],
     ["ID", "IS NOT", {"<":0}],
     ["Gender", "NOT IN", ["Male","Female","Others"]]
   ],
