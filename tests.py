@@ -1,7 +1,8 @@
 # from PyNeFrauds.Globals import neo4jHandler
 import PyNeFrauds
 import PyNeFrauds.QueryConstructor as QueryConstructor
-from PyNeFrauds.GNN import EmbedFetcher
+from PyNeFrauds.nn import EmbedFetcher
+from PyNeFrauds.nn import PyGData
 # from PyNeFrauds.Constructor import testFun
 # from PyNeFrauds.extractor import verifyAttributeProperties
 
@@ -48,7 +49,10 @@ json_text = '''
 # cone.showQueries()
 
 PyNeFrauds.Globals.neo4jHandler.set_credentials("bolt://localhost:11003", "neo4j","password")
-x = PyNeFrauds.GNN.EmbedFetcher(embedProperty="fastRP", uniqueID=None, target="fraud")
+x = PyNeFrauds.nn.EmbedFetcher(embedProperty="fastRP", uniqueID=None, target="fraud")
 REF_INDEX, featureMatrix, edge_index, targets = x.fetchData()
 # print(x.fetch_node_embeddings()[0])
-print(featureMatrix)
+pd = PyGData()
+pd.fromEmbedFetcher(x)
+pd.showDataInfo()
+# print(edge_index)
