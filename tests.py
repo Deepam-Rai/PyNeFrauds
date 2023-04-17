@@ -48,6 +48,7 @@ json_text = '''
 # cone.showQueries()
 
 PyNeFrauds.Globals.neo4jHandler.set_credentials("bolt://localhost:11003", "neo4j","password")
-x = PyNeFrauds.GNN.EmbedFetcher(embedProperty="GraphSage", uniqueID="project_id", target="fraud")
+x = PyNeFrauds.GNN.EmbedFetcher(embedProperty="fastRP", uniqueID=None, target="fraud")
 REF_INDEX, featureMatrix, edge_index, targets = x.fetchData()
-print(edge_index)
+# print(x.fetch_node_embeddings()[0])
+print(featureMatrix)

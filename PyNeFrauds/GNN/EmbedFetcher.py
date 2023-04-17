@@ -1,20 +1,24 @@
 from ..Globals import *
 import numpy as np
+import torch
 
 class EmbedFetcher():
     def __init__(self, embedProperty, uniqueID=None, target=None):
         """
+        Warning: If uniqueID value is provided and the property doesn't exist in neo4j, then some junk value will be returned.
         Args:
-            embedProperty (_type_): the property that contains embeddings
-            uniqueID (_type_): property that is unique for every node. Defaults to None, in which case neo4j assigned <id> are used.
-            target (_type_, optional): target value/ground truth property name. Defaults to None.
+            embedProperty (str): the property that contains embeddings
+            uniqueID (str): property that is unique for every node. Defaults to None, in which case neo4j assigned <id> are used.
+            target (str, optional): target value/ground truth property name. Defaults to None.
         """
         self.embedProperty = embedProperty
         self.uniqueID = uniqueID
         self.target = target
     
     def fetch_node_embeddings(self, nodeType=None):
-        """Gets the node embedding of specified NodeType from the specified node embedding property.
+        """Gets the node embedding of specified NodeType from the specified node embedding property from neo4j.
+        If uniqueID is set to None, then uses neo4j assigned unique id as primary key to identify nodes and
+            sets self.uniqueID as 'Neo4jID'.
 
         Args:
             nodeType (str, optional): Specific node type of which embeddings are required. 
@@ -29,8 +33,6 @@ class EmbedFetcher():
         self.embeddings = result
         return result
 
-
-
     def set_ref_indexes(self):
         """Assigns a unique integer to all the nodes. 
         This integers form the index of this nodes in the feature matrix and same is used to indicate nodes in COO edge matrix too.
@@ -40,51 +42,60 @@ class EmbedFetcher():
         """
         self.REF_INDEX = {}
         for i, node in enumerate(self.embeddings):
-            self.REF_INDEX[node[self.uniqueID]] = i
+            self.REF_INDEX[node[ "Neo4jID" if self.uniqueID is None else self.uniqueID]] = i
         return self.REF_INDEX
 
 
 
     def fetch_feature_matrix(self):
-        '''Fetches feature matrix from neo4j and also sets as own property.
-        id: id that uniquely identifies every node. Should be present in REF_INDEX; these are taken as nodes
-        propertyName: Dictionary key in which the embedding is saved as list; these are taken as features
-        embeddings: List of Dictionaries with necessary two keys in dictionary;
-                    i) id
-                    ii) propertyName
-        returns: (num nodes)x(num features) numpy matrix
-        '''
-        self.featureMatrix = np.zeros((len(self.embeddings), len(self.embeddings[0][self.embedProperty])))
+        """Fetches the self.embedProperty values for all nodes from neo4j.  
+            Sets the fetched feature matrix as self.featureMatrix in tensor form.
+
+        Returns:
+            numpy.ndarray: feature matrix 
+        """
+        featureMatrix = np.zeros((len(self.embeddings), len(self.embeddings[0][self.embedProperty])))
+        uniqueID = "Neo4jID" if self.uniqueID is None else self.uniqueID
         for node in self.embeddings:
-            self.featureMatrix[ self.REF_INDEX[node[self.uniqueID]]] = np.array(node[self.embedProperty])
-        return self.featureMatrix
+            featureMatrix[ self.REF_INDEX[node[uniqueID]]] = np.array(node[self.embedProperty])
+        self.featureMatrix = torch.tensor(featureMatrix)
+        return featureMatrix
 
 
     def fetch_edge_COO(self,relationName=None, sourceProperty='project_id', destProperty='project_id'):
-        '''relationName: If None then gets for all kind of relationships.
-        sourceProperty: Source node identifier. Should be part of REF_INDEX
-        nodeProperty: Destination node identifier. Should be part of REF_INDEX
-        Querer: QueryEx object that executes queries
-        These two are basically to know from which node to which node relation is connecting.
-        Returns a list of [source,destination] pairs for that relation as numpy.ndarray
-        '''
-        query = f'MATCH (n)-[r{"" if relationName is None else ":"+relationName}]->(m) RETURN  COLLECT([n.{sourceProperty} , m.{destProperty}]) as edge'
+        """Fetches the 'relationName' relations from neo4j database. Converts into COO edge_index.
+        Sets self.edge_index as fetched edge_COO in tensor form. 
+
+        Args:
+            relationName (_type_, optional): _description_. Defaults to None.
+            sourceProperty (str, optional): _description_. Defaults to 'project_id'.
+            destProperty (str, optional): _description_. Defaults to 'project_id'.
+
+        Returns:
+            _type_: _description_
+        """
+        query = f'MATCH (n)-[r{"" if relationName is None else ":"+relationName}]->(m) \
+            RETURN  COLLECT({ "[id(n),id(m)]" if self.uniqueID is None else "[n." +self.uniqueID+" , m."+self.uniqueID+"]"}) as edge'
         result = neo4jHandler.query(query)
         unprocessed = result[0]['edge']
         processed = [[self.REF_INDEX[x[0]],self.REF_INDEX[x[1]]] for x in unprocessed]
-        self.edge_index = processed
+        self.edge_index = torch.tensor(processed)
         return processed
 
 
     def set_targets(self):
-        '''Returns: target values - corresponding to the self.fraudLabel
-        '''
+        """From self.embeddings sets the self.targets. sets to None if self.target is None.
+            self.targets are the values of the property with name {self.targets} in neo4j database.
+        Returns:
+            self.targets
+        """
         if self.target is None:
+            self.targets=None
             return None
-        targets = np.zeros(len(self.embeddings))
+        self.targets = np.zeros(len(self.embeddings))
         for node in self.embeddings:
-            targets[ self.REF_INDEX[node[self.uniqueID]]] = np.array(node[self.target])
-        return targets
+            self.targets[ self.REF_INDEX[node["Neo4jID" if self.uniqueID is None else self.uniqueID]]] = np.array(node[self.target])
+        return self.targets
 
 
     def fetchData(self,nodeType=None, relName=None,):
@@ -108,6 +119,6 @@ class EmbedFetcher():
         #get coo edge-index
         self.fetch_edge_COO(relationName=relName, sourceProperty=self.uniqueID, destProperty=self.uniqueID)
         #get targets
-        targets = self.set_targets()
+        self.set_targets()
 
-        return self.REF_INDEX, self.featureMatrix, self.edge_index, targets
+        return self.REF_INDEX, self.featureMatrix, self.edge_index, self.targets
