@@ -1,0 +1,1 @@
+Python Library that integrates with neo4j and aims to make the process of fraud detection using knowledge graphs easier.

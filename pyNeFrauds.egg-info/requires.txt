@@ -1,0 +1,6 @@
+matplotlib
+neo4j
+numpy
+scikit_learn
+torch
+torch_geometric

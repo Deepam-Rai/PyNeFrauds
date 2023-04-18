@@ -1,0 +1,13 @@
+Metadata-Version: 2.1
+Name: pyNeFrauds
+Version: 0.0.4
+Summary: Python library that integrates with neo4j facilitating in fraud detection using deep learning techniques.
+Author: Deepam Rai
+License: MIT
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
+License-File: LICENSE.txt
+
+Python Library that integrates with neo4j and aims to make the process of fraud detection using knowledge graphs easier.
