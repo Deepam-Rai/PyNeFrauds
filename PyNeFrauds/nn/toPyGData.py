@@ -1,15 +1,15 @@
 import torch
 from torch_geometric.data import Data
 
-class PyGData():
+class PyGDataWrapper():
     def __init__(self, featureMatrix=None, edge_index=None, targets=None ):
         """Class that wraps the torch_geometric.data.Data for this library.
         Aim is to make handling, manipulating torch_geometric accepted data easy.
-
-        Args:
-            featureMatrix (_type_, optional): _description_. Defaults to None.
-            edge_index (_type_, optional): _description_. Defaults to None.
-            targets (_type_, optional): _description_. Defaults to None.
+        Stores torch_geometric.data.Data in self.data
+        Args: [Can be of type numpy.ndarray or python number list, transforms and stores them as torch.tensor()]
+            featureMatrix (optional): Defaults to None.
+            edge_index (optional): Defaults to None.
+            targets (optional): Defaults to None.
         """
         featureMatrix = None if featureMatrix is None else torch.tensor(featureMatrix, dtype=torch.float)
         edge_index = None if edge_index is None else torch.tensor(edge_index, dtype=torch.long)
@@ -27,8 +27,10 @@ class PyGData():
         Args:
             embedFetched (EmbedFetcher): object
         """
+        x = torch.tensor(embedFetched.featureMatrix, dtype=torch.float)
+        edge_index = torch.tensor(embedFetched.edge_index, dtype=torch.long)
         y = None if embedFetched.targets is None else torch.tensor(embedFetched.targets, dtype=torch.long)
-        self.data = Data(x=embedFetched.featureMatrix, edge_index=embedFetched.edge_index, y=y)
+        self.data = Data(x=x, edge_index=edge_index, y=y)
 
     def showDataInfo(self):
         # Print information about the dataset

@@ -2,7 +2,14 @@
 import PyNeFrauds
 import PyNeFrauds.QueryConstructor as QueryConstructor
 from PyNeFrauds.nn import EmbedFetcher
-from PyNeFrauds.nn import PyGData
+from PyNeFrauds.nn import PyGDataWrapper
+from PyNeFrauds.nn import NNModel
+from PyNeFrauds.nn import train
+
+import torch.nn as tnn
+import torch_geometric.nn as tgnn
+
+from collections import OrderedDict
 # from PyNeFrauds.Constructor import testFun
 # from PyNeFrauds.extractor import verifyAttributeProperties
 
@@ -52,7 +59,24 @@ PyNeFrauds.Globals.neo4jHandler.set_credentials("bolt://localhost:11003", "neo4j
 x = PyNeFrauds.nn.EmbedFetcher(embedProperty="fastRP", uniqueID=None, target="fraud")
 REF_INDEX, featureMatrix, edge_index, targets = x.fetchData()
 # print(x.fetch_node_embeddings()[0])
-pd = PyGData()
-pd.fromEmbedFetcher(x)
-pd.showDataInfo()
+dWrap = PyGDataWrapper()
+dWrap.fromEmbedFetcher(x)
+dWrap.showDataInfo()
 # print(edge_index)
+modules = OrderedDict({
+    'GCN1' : tgnn.GCNConv(7, 30),
+    'drop0': tnn.Dropout(p=0.5),
+    'relu1': tnn.ReLU(),
+    'GCN2' : tgnn.GCNConv(30, 40),
+    'relu1': tnn.ReLU(),
+    'linear': tnn.Linear(40,512),
+    'relul1': tnn.ReLU(),
+    'drop1': tnn.Dropout(p=0.2),
+    'linear2': tnn.Linear(512,2),
+    'softmax': tnn.Softmax(dim=1)
+})
+
+model = NNModel(modules=modules)
+print(model)
+
+train(model=model, data=dWrap.data, n_epoch=901, print_interval=30)

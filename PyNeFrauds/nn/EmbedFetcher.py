@@ -1,6 +1,6 @@
 from ..Globals import *
 import numpy as np
-import torch
+# import torch
 
 class EmbedFetcher():
     def __init__(self, embedProperty, uniqueID=None, target=None):
@@ -58,7 +58,7 @@ class EmbedFetcher():
         uniqueID = "Neo4jID" if self.uniqueID is None else self.uniqueID
         for node in self.embeddings:
             featureMatrix[ self.REF_INDEX[node[uniqueID]]] = np.array(node[self.embedProperty])
-        self.featureMatrix = torch.tensor(featureMatrix, dtype=torch.float)
+        self.featureMatrix = featureMatrix #torch.tensor(featureMatrix, dtype=torch.float)
         return featureMatrix
 
 
@@ -79,7 +79,7 @@ class EmbedFetcher():
         result = neo4jHandler.query(query)
         unprocessed = result[0]['edge']
         processed = [[self.REF_INDEX[x[0]],self.REF_INDEX[x[1]]] for x in unprocessed]
-        self.edge_index = torch.tensor(processed, dtype=torch.long)
+        self.edge_index = processed #torch.tensor(processed, dtype=torch.long)
         return processed
 
 
