@@ -48,4 +48,5 @@ class PyGDataWrapper():
         # Print information about the dataset
         print(f'\nNumber of nodes: {self.data.x.shape[0]}')
         print(f'Number of features: {self.data.num_features}')
+        print(f'Number of relations: {len(self.data.edge_index)}')
         print(f'Has isolated nodes: {self.data.has_isolated_nodes()}')
