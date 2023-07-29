@@ -17,7 +17,7 @@ setuptools.setup(
 	# url="https://github.",
 	packages=setuptools.find_packages(),
 
-		 install_requires=["matplotlib","neo4j","numpy","scikit_learn","torch","torch_geometric"],
+		 install_requires=["matplotlib","neo4j","numpy","scikit_learn","torch","torch_geometric","pandas"],
 
 
 	license="MIT",

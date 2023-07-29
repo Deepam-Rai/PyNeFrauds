@@ -1,14 +1,6 @@
-############# to remove
-import os
-import sys
-lib_path = os.path.join(os.getcwd(), "../PyNeFrauds")
-sys.path.append(lib_path)
-#############
-
 import pandas as pd
-# from PyNeFrauds.Neo4jHandler import Neo4jHandler
-from PyNeFrauds.PyNeFrauds.Globals import neo4jHandler
-from PyNeFrauds.PyNeFrauds.neo4j_populator import create_nodes, create_relations, create_nodes_and_relations
+from PyNeFrauds.Globals import neo4jHandler
+from PyNeFrauds.neo4j_populator import create_nodes, create_relations, create_nodes_and_relations
 
 print("Setting up the neo4j handler...")
 host = 'bolt://localhost:7687'
@@ -17,7 +9,7 @@ password = "password"
 querer = neo4jHandler.set_credentials(host, user, password)
 
 # example data
-df = pd.read_excel('./demo_data_medical.xlsx')
+df = pd.read_csv('demo_data_medical.csv')
 print("Data Read.")
 
 # populating neo4j

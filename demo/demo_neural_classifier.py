@@ -1,16 +1,8 @@
-############# to remove
-import os
-import sys
-lib_path = os.path.join(os.getcwd(), "../PyNeFrauds")
-sys.path.append(lib_path)
-#############
-
-import pandas as pd
-from PyNeFrauds.PyNeFrauds.Globals import neo4jHandler
-from PyNeFrauds.PyNeFrauds.nn import EmbedFetcher, PyGDataWrapper
+from PyNeFrauds.Globals import neo4jHandler
+from PyNeFrauds.nn import EmbedFetcher, PyGDataWrapper
 
 from collections import OrderedDict
-from PyNeFrauds.PyNeFrauds.nn import NNModel, train, ConfusionMatrix
+from PyNeFrauds.nn import NNModel, train, ConfusionMatrix
 import torch_geometric.nn as tgnn
 import torch.nn as tnn
 
@@ -34,28 +26,22 @@ print("Fetching the embeddings from neo4j...")
 embedFetcher.fetchData()
 
 # create torch_geometric acceptable format
-dWrap = PyGDataWrapper()
-dWrap.from_embed_fetcher(embedFetcher)
-dWrap.set_train_mask(frac=0.2)
+dWrap = PyGDataWrapper()   # this object will convert the neo4j data to torch-geometric accepted data
+dWrap.from_embed_fetcher(embedFetcher)   # converts the data
+dWrap.set_train_mask(frac=0.2)    # GNN can use train-masks for better performance
 
 print("\nDetails of fetched data:")
 dWrap.show_data_info()
 
 
 print("\nNN model:")
-modules = OrderedDict({
+modules = OrderedDict({            #define the layers of model
     'GCN1' : tgnn.GCNConv(7, 16),
-    # 'drop0': tnn.Dropout(p=0.5),
     'relu1': tnn.ReLU(),
-    # 'GCN2' : tgnn.GCNConv(30, 40),
-    # 'relu1': tnn.ReLU(),
     'linear': tnn.Linear(16,2),
-    # 'relul1': tnn.ReLU(),
-    # 'drop1': tnn.Dropout(p=0.2),
-    # 'linear2': tnn.Linear(512,2),
     'softmax': tnn.Softmax(dim=1)
 })
-model = NNModel(modules=modules)
+model = NNModel(modules=modules)  #instantiate the model
 print(model)
 
 print("\nTraining NN model...")
