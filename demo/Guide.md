@@ -20,7 +20,7 @@ The relationships among them are:
 3. (Doctor)-[TREATS]->(Problem)
 
 The dataset looks like:
-![Demo Dataset](Imagesataset.png)
+![Demo Dataset](./Images/dataset.png)
 
 ----
 # Installation
@@ -40,7 +40,8 @@ Way (2) is done in `demo_populating_neo4j_2.py`.
 Both files are commented to explain the steps.
 
 The populated neo4j database should look like:
-![neo4j databse](Imageseo4j_database.png)
+
+![neo4j databse](./Images/neo4j_database.png)
 
 Irrespective of whichever way you populate, output is same.
 
@@ -66,7 +67,7 @@ MATCH (n) SET n.unique_id = id(n)
 The methods are provided as plugins, called GDS(Graph Data Science) library for neo4j-desktop. They need to be installed for each neo4j database where you want to use them.  
 Official GDS guide [here](https://neo4j.com/docs/graph-data-science/current/).  
 Plugins in neo4j-desktop:
-![plugins](Imageslugins.png)
+![plugins](./Images/plugins.png)
 
 After installation their functions and methods can be used directly in neo4j browser.  
 
