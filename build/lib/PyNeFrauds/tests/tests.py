@@ -1,4 +1,4 @@
-# from PyNeFrauds.Globals import neo4jHandler
+2
 import PyNeFrauds.QueryConstructor as QueryConstructor
 from PyNeFrauds.nn import EmbedFetcher
 from PyNeFrauds.nn import PyGDataWrapper
@@ -9,7 +9,7 @@ import torch.nn as tnn
 import torch_geometric.nn as tgnn
 
 from collections import OrderedDict
-# from PyNeFrauds.Constructor import testFun
+# from PyNeFrauds.Constructor import testFun4
 # from PyNeFrauds.extractor import verifyAttributeProperties
 
 

@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
 	name="pyNeFrauds",
-	version="0.0.4",
+	version="0.0.5",
 	author="Deepam Rai",
 	# author_email="",
 	description="Python library that integrates with neo4j facilitating in fraud detection using deep learning techniques.",
