@@ -11,12 +11,12 @@ class ConstrType(Enum):
 # START functions for constructing conditions
 
 def mergeNodeConditions(queries, nRef, nLabel):
-    '''queries: dict { priority level : list of sub-queries}
+    """queries: dict { priority level : list of sub-queries}
     nRef: node reference to use in query
     nLabel: node label
     Merges for each level and 
     returns a query for each priority level
-    '''
+    """
     merged = {}
     for level in queries:
         query = ' OR '.join(queries[level])
@@ -25,13 +25,13 @@ def mergeNodeConditions(queries, nRef, nLabel):
 
 
 def constrType(restraint):
-    '''Identify its type: range, regex, list, etc
+    """Identify its type: range, regex, list, etc
     Accepted types:
     list -> list
     dict -> numerical range
     str -> regex
     #TODO more detailed checks: range has min,max?
-    '''
+    """
     if isinstance(restraint, list):
         return ConstrType.LIST
     if isinstance(restraint, dict):
@@ -42,14 +42,14 @@ def constrType(restraint):
 
 
 def constrQuery(preCondition, restraint, nRef, aRef):
-    '''
+    """
     preCondition: "IS", "IS NOT", "IN", "NOT IN".
     restraint: constraint
     nRef: Node reference to use in query
     aRef: attribute name
     Identifies what kind of restraint it is.
     Constructs query for it.
-    Returns: CYPHER query for this restraint.'''
+    Returns: CYPHER query for this restraint."""
     typ = constrType(restraint)
     if 'NOT' in preCondition.split():
         query = " NOT "
@@ -72,7 +72,7 @@ def constrQuery(preCondition, restraint, nRef, aRef):
 
 
 def constrNodeCond(node, nRef='n'):
-    '''node: a node's schema
+    """node: a node's schema
     nRef: node reference to use in queries
     Construct queries for a node.
     Returns:
@@ -80,7 +80,7 @@ def constrNodeCond(node, nRef='n'):
         level : [list of queries],
         .
         .
-    }'''
+    }"""
     queries = {}
 
     def addQuery(query, level):
@@ -106,9 +106,9 @@ def constrNodeCond(node, nRef='n'):
 
 
 def constrNodeQueries(nodeTests, nRef):
-    '''<dict> nodeTests: tests on the node attributes
+    """<dict> nodeTests: tests on the node attributes
     <str> nRef: node reference to use in query
-    returns: {level : query} for every level in dict nodeTests'''
+    returns: {level : query} for every level in dict nodeTests"""
     queries = {}
     for level in nodeTests:
         query = f'MATCH ({nRef}) \n WHERE '
@@ -119,13 +119,13 @@ def constrNodeQueries(nodeTests, nRef):
 
 
 def constructQueries(jsonSchema, mode='STREAM'):
-    '''
+    """
     jsonSchema: node schema for whole graph.
     mode: #TODO
         STREAM = displays the nodes who fail conditions on the browser,
         WRITE = Sets a node property according to the evaluation of condition
     returns queries for nodes.
-    '''
+    """
     queries = {}
     for node in jsonSchema:
         nRef = 'n'

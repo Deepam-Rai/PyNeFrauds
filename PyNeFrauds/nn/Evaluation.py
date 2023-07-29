@@ -28,6 +28,8 @@ def ConfusionMatrix(data, model, use_test_mask=False, saveFig=None, display=Fals
                    if use_test_mask else y_pred).detach().numpy()
     y_test = (data.y[test_mask] if use_test_mask else data.y).detach().numpy()
 
+    print(classification_report(y_pred=y_pred_test, y_true=y_test))
+
     cm = confusion_matrix(y_true=y_test, y_pred=y_pred_test)
 
     dcm = ConfusionMatrixDisplay(
@@ -47,4 +49,3 @@ def ConfusionMatrix(data, model, use_test_mask=False, saveFig=None, display=Fals
         plt.savefig(os.path.join(picture_folder, name))
         print(f'Confusion matrix saved as "{name}" at {picture_folder}')
 
-    print(classification_report(y_pred=y_pred_test, y_true=y_test))
