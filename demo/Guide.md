@@ -23,6 +23,12 @@ The dataset looks like:
 ![Demo Dataset](Imagesataset.png)
 
 ----
+# Installation
+```shell
+pip install pyNeFrauds
+```
+
+----
 # Populating neo4j
 There are two ways to populate neo4j using PyneFrauds.
 1. Each node and relationship type individually.
